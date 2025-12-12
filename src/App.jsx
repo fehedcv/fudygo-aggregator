@@ -2,7 +2,8 @@ import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import RestaurantDetails from './pages/RestaurantDetails';
-import Cart from './pages/Cart'; // Import Cart
+import Cart from './pages/Cart';
+import Profile from './pages/Profile'; // Import Profile
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/restaurant/:id" element={<RestaurantDetails />} />
         <Route path="/cart" element={<Cart />} />
+        <Route path="/profile" element={<Profile />} /> {/* Add Route */}
       </Routes>
     </div>
   );

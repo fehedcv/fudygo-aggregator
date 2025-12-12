@@ -13,6 +13,12 @@ export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Helper to determine the correct Base URL dynamically
+  const getBaseUrl = () => {
+    if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+    return `http://${window.location.hostname}:8000`;
+  };
+
   // Unified Login Function
   const loginWithGoogle = async () => {
     try {
@@ -34,7 +40,7 @@ export const AuthProvider = ({ children }) => {
 
       // 3. Send to Backend to set Session Cookie
       // We use raw axios here to ensure 'withCredentials' is set for the cookie exchange
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+      const API_URL = getBaseUrl();
       
       await axios.post(
         `${API_URL}/auth/session-login`, 
@@ -65,7 +71,8 @@ export const AuthProvider = ({ children }) => {
       }
       
       // Optional: Call backend to clear cookie
-      // await axios.post(`${import.meta.env.VITE_API_URL}/auth/logout`);
+      // const API_URL = getBaseUrl();
+      // await axios.post(`${API_URL}/auth/logout`);
 
     } catch (error) {
       console.error("Logout failed", error);

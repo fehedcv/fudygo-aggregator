@@ -2,8 +2,19 @@
 import axios from 'axios';
 import { auth } from '../firebase'; // Import Firebase auth
 
+// Helper to determine the correct Base URL dynamically
+const getBaseUrl = () => {
+  // 1. If explicitly set in .env, use that
+  if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+  
+  // 2. Dynamic Fallback:
+  // If you are on localhost, it points to localhost:8000
+  // If you are on 192.168.1.11, it points to 192.168.1.11:8000
+  return `http://${window.location.hostname}:8000`;
+};
+
 const axiosClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000', // Ensure this matches your backend port
+  baseURL: getBaseUrl(),
   withCredentials: true, // Crucial for cookie-based sessions
   headers: {
     'Content-Type': 'application/json',
