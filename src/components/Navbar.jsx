@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useLocation } from '../context/LocationContext';
-import { useAuth } from '../context/AuthContext'; // Import Auth
+import { useAuth } from '../context/AuthContext';
 import { 
   Home, ShoppingBag, RotateCcw, Menu, X, MapPin, 
-  ChevronDown, MoreHorizontal, SlidersHorizontal, User 
+  ChevronDown, MoreHorizontal, SlidersHorizontal, User, Receipt // Import Receipt Icon
 } from 'lucide-react';
 import LocationModal from './LocationModal';
 import FilterDrawer from './FilterDrawer';
@@ -18,12 +18,14 @@ const Navbar = () => {
   
   const { locationName, updateLocation } = useLocation();
   const { getCartCount } = useCart();
-  const { currentUser } = useAuth(); // Get current user
+  const { currentUser } = useAuth();
   
   const cartCount = getCartCount();
 
+  // Add 'Orders' to the navigation links array
   const navLinks = [
     { name: 'Home', icon: Home, path: '/' },
+    { name: 'Orders', icon: Receipt, path: '/orders' }, // New Link
     { name: 'Reorder', icon: RotateCcw, path: '#' },
   ];
 
@@ -85,7 +87,7 @@ const Navbar = () => {
                 </Link>
               ) : (
                 <button 
-                    onClick={() => navigate('/cart')} // Redirect to cart to trigger login prompt for now
+                    onClick={() => navigate('/cart')} 
                     className="text-sm font-bold text-gray-700 hover:text-red-600"
                 >
                     Log In
@@ -95,17 +97,14 @@ const Navbar = () => {
 
             {/* MOBILE ICONS SECTION */}
             <div className="flex items-center xl:hidden gap-2">
-               {/* 1. Mobile Location */}
                <button onClick={() => setIsLocationModalOpen(true)} className="p-2 text-gray-600 hover:text-red-600 transition-colors md:hidden">
                 <MapPin className="w-6 h-6" />
               </button>
               
-              {/* 2. Mobile Filter */}
               <button onClick={() => setIsFilterOpen(true)} className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors">
                 <SlidersHorizontal className="w-6 h-6" />
               </button>
 
-              {/* 3. Mobile User Profile (New) */}
               <Link to={currentUser ? "/profile" : "/cart"} className="p-2 text-gray-600 hover:text-red-600 transition-colors">
                  {currentUser && currentUser.photoURL ? (
                      <img src={currentUser.photoURL} className="w-6 h-6 rounded-full border border-gray-200" alt="User" />
@@ -114,7 +113,6 @@ const Navbar = () => {
                  )}
               </Link>
 
-              {/* 4. Mobile Cart (Requested) */}
               <Link to="/cart" className="relative p-2 text-gray-600 hover:text-red-600 transition-colors">
                 <ShoppingBag className="w-6 h-6" />
                 {cartCount > 0 && (
@@ -122,7 +120,6 @@ const Navbar = () => {
                 )}
               </Link>
 
-              {/* 5. Mobile Menu */}
               <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-2 rounded-md text-gray-600 hover:text-red-600 hover:bg-gray-100 transition-colors">
                 {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>
@@ -140,9 +137,18 @@ const Navbar = () => {
                 <span className="text-xs text-blue-500 ml-auto font-medium">Change</span>
               </div>
               
-              <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 px-3 py-3 rounded-md text-base font-medium text-gray-600 hover:text-red-600 hover:bg-gray-50">
-                  <Home className="w-5 h-5" /> Home
-              </Link>
+              {/* Map through navLinks for Mobile Menu as well */}
+              {navLinks.map((link) => (
+                <Link 
+                  key={link.name}
+                  to={link.path} 
+                  onClick={() => setIsMobileMenuOpen(false)} 
+                  className="flex items-center gap-3 px-3 py-3 rounded-md text-base font-medium text-gray-600 hover:text-red-600 hover:bg-gray-50"
+                >
+                    <link.icon className="w-5 h-5" /> {link.name}
+                </Link>
+              ))}
+
               <Link to="/profile" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 px-3 py-3 rounded-md text-base font-medium text-gray-600 hover:text-red-600 hover:bg-gray-50">
                   <User className="w-5 h-5" /> My Profile
               </Link>
@@ -154,7 +160,6 @@ const Navbar = () => {
         )}
       </nav>
 
-      {/* RENDER MODALS */}
       <LocationModal isOpen={isLocationModalOpen} onClose={() => setIsLocationModalOpen(false)} onUpdateLocation={updateLocation} />
       <FilterDrawer isOpen={isFilterOpen} onClose={() => setIsFilterOpen(false)} />
     </>

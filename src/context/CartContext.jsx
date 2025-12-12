@@ -5,7 +5,7 @@ const CartContext = createContext();
 export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children }) => {
-  // Initialize Cart State
+  // Initialize state from LocalStorage
   const [cart, setCart] = useState(() => {
     const savedCart = localStorage.getItem('fudygo_cart');
     return savedCart 
@@ -13,7 +13,6 @@ export const CartProvider = ({ children }) => {
       : { restaurantId: null, restaurantName: null, items: [] };
   });
 
-  // Initialize Address State (Defaulting to a mock "Home" address)
   const [deliveryAddress, setDeliveryAddress] = useState({
     id: 1,
     label: 'Home',
@@ -21,12 +20,11 @@ export const CartProvider = ({ children }) => {
     icon: 'home'
   });
 
-  // Save Cart to LocalStorage
   useEffect(() => {
     localStorage.setItem('fudygo_cart', JSON.stringify(cart));
   }, [cart]);
 
-  // --- Cart Actions ---
+  // --- ACTIONS ---
 
   const addToCart = (item, restaurantId, restaurantName) => {
     if (cart.restaurantId && cart.restaurantId !== restaurantId) {
@@ -44,7 +42,7 @@ export const CartProvider = ({ children }) => {
     }
 
     setCart((prev) => {
-      const existingItem = prev.items.find((i) => i.name === item.name);
+      const existingItem = prev.items.find((i) => i.name === item.name); // Using name as ID for now, ideally use item.id
       let newItems;
       if (existingItem) {
         newItems = prev.items.map((i) =>
@@ -88,6 +86,13 @@ export const CartProvider = ({ children }) => {
     });
   };
 
+  // NEW: Clear Cart Function
+  const clearCart = () => {
+    const emptyState = { restaurantId: null, restaurantName: null, items: [] };
+    setCart(emptyState);
+    localStorage.removeItem('fudygo_cart');
+  };
+
   const getCartTotal = () => {
     return cart.items.reduce((total, item) => total + (parseFloat(item.price) * item.quantity), 0).toFixed(2);
   };
@@ -102,10 +107,11 @@ export const CartProvider = ({ children }) => {
       addToCart, 
       removeFromCart, 
       updateQuantity, 
+      clearCart, // Export this
       getCartTotal, 
       getCartCount,
-      deliveryAddress,   // Export address
-      setDeliveryAddress // Export setter
+      deliveryAddress,
+      setDeliveryAddress 
     }}>
       {children}
     </CartContext.Provider>

@@ -3,7 +3,8 @@ import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import RestaurantDetails from './pages/RestaurantDetails';
 import Cart from './pages/Cart';
-import Profile from './pages/Profile'; // Import Profile
+import Profile from './pages/Profile';
+import Orders from './pages/Orders'; // 1. Import the Orders page
 
 function App() {
   return (
@@ -13,7 +14,10 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/restaurant/:id" element={<RestaurantDetails />} />
         <Route path="/cart" element={<Cart />} />
-        <Route path="/profile" element={<Profile />} /> {/* Add Route */}
+        <Route path="/profile" element={<Profile />} />
+        
+        {/* 2. Add the Route here */}
+        <Route path="/orders" element={<Orders />} /> 
       </Routes>
     </div>
   );

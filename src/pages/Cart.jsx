@@ -12,26 +12,24 @@ import CheckoutSidebar from '../components/cart/CheckoutSidebar';
 import AddressModal from '../components/cart/AddressModal';
 
 const Cart = () => {
-  const { cart, updateQuantity, removeFromCart, getCartTotal, deliveryAddress, setDeliveryAddress } = useCart();
+  // Destructure clearCart from context
+  const { cart, updateQuantity, removeFromCart, clearCart, getCartTotal, deliveryAddress, setDeliveryAddress } = useCart();
   const { currentUser, loginWithGoogle, logout } = useAuth();
   const navigate = useNavigate();
   
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [savedAddresses, setSavedAddresses] = useState([]);
   const [loadingAddresses, setLoadingAddresses] = useState(false);
-  
-  // Order State
   const [instructions, setInstructions] = useState('');
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
 
-  // --- Fetch Addresses on Login ---
+  // ... (Keep existing useEffect for fetching addresses) ...
   useEffect(() => {
     const fetchAddresses = async () => {
       if (!currentUser) {
         setSavedAddresses([]);
         return;
       }
-
       setLoadingAddresses(true);
       try {
         const response = await axiosClient.get('/addresses/me');
@@ -53,11 +51,9 @@ const Cart = () => {
         setLoadingAddresses(false);
       }
     };
-
     fetchAddresses();
   }, [currentUser, setDeliveryAddress]);
 
-  // Handler for address selection
   const handleAddressSelect = (addr) => {
     setDeliveryAddress({
         id: addr.id,
@@ -77,7 +73,6 @@ const Cart = () => {
 
     setIsPlacingOrder(true);
 
-    // 1. Construct Payload
     const orderPayload = {
         restaurant_id: cart.restaurantId,
         delivery_address_id: deliveryAddress.id,
@@ -87,22 +82,22 @@ const Cart = () => {
             quantity: item.quantity
         })),
         payment_method: "cash",
-        special_instructions: instructions || "None", // Ensure string even if empty
+        special_instructions: instructions || "None",
         scheduled_time: null
     };
 
     try {
-        // 2. Send Request
         const response = await axiosClient.post('/orders/', orderPayload);
         console.log("Order Placed:", response);
         
-        // 3. Success Handling
-        alert("Order placed successfully! (You can implement Cart Clear logic here)");
-        // navigate('/orders'); // Redirect to order history or tracking page
+        alert("Order placed successfully!");
         
-        // Note: You should ideally add a clearCart() function to your CartContext 
-        // and call it here to empty the basket.
-
+        // 1. Clear the cart
+        clearCart();
+        
+        // 2. The component will re-render, see cart.items.length === 0, 
+        // and automatically show the <CartEmptyState /> component.
+        
     } catch (error) {
         console.error("Order Failed:", error);
         alert("Failed to place order. Please try again.");
@@ -116,14 +111,11 @@ const Cart = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8 font-sans">
       <div className="max-w-5xl mx-auto">
-        
-        {/* Header */}
         <div className="flex justify-between items-center mb-8">
             <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
             <Link to="/" className="text-gray-400 hover:text-red-600 transition-colors"><ArrowLeft className="w-6 h-6" /></Link>
             Checkout
             </h1>
-            
             {currentUser && (
                 <div className="flex items-center gap-3">
                     <img src={currentUser.photoURL} alt="User" className="w-8 h-8 rounded-full border border-gray-200" />
@@ -133,8 +125,6 @@ const Cart = () => {
         </div>
 
         <div className="flex flex-col lg:flex-row gap-8">
-          
-          {/* Left Column: Items */}
           <CartItems 
             cart={cart} 
             updateQuantity={updateQuantity} 
@@ -142,8 +132,6 @@ const Cart = () => {
             instructions={instructions}
             setInstructions={setInstructions}
           />
-
-          {/* Right Column: Checkout Flow */}
           <div className="w-full lg:w-96 space-y-6">
             <CheckoutSidebar 
               currentUser={currentUser}
@@ -158,7 +146,6 @@ const Cart = () => {
         </div>
       </div>
 
-      {/* Address Modal */}
       <AddressModal 
         isOpen={isAddressModalOpen}
         onClose={() => setIsAddressModalOpen(false)}
