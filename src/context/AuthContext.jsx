@@ -3,7 +3,6 @@ import { auth, googleProvider } from "../firebase";
 import { signInWithPopup, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithCredential } from "firebase/auth";
 import { Capacitor } from '@capacitor/core';
 import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
-import axios from 'axios'; // Import raw axios for the handshake
 
 const AuthContext = createContext();
 
@@ -16,7 +15,13 @@ export const AuthProvider = ({ children }) => {
   // Helper to determine the correct Base URL dynamically
   const getBaseUrl = () => {
     if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
-    return `http://${window.location.hostname}:8000`;
+    try {
+      const hostname = window?.location?.hostname || '';
+      if (hostname === 'localhost' || hostname === '127.0.0.1') return 'http://localhost:8000';
+    } catch (e) {
+      // ignore
+    }
+    return 'http://10.0.2.2:8000';
   };
 
   // Unified Login Function
@@ -35,27 +40,13 @@ export const AuthProvider = ({ children }) => {
         user = result.user;
       }
 
-      // 2. Get the JWT Token (idToken)
-      const idToken = await user.getIdToken();
-
-      // 3. Send to Backend to set Session Cookie
-      // We use raw axios here to ensure 'withCredentials' is set for the cookie exchange
-      const API_URL = getBaseUrl();
-      
-      await axios.post(
-        `${API_URL}/auth/session-login`, 
-        { idToken: idToken }, 
-        { 
-          withCredentials: true, // Crucial: allows backend to set the cookie
-          headers: { 'Content-Type': 'application/json' }
-        }
-      );
-
-      console.log("Backend session established successfully");
+      // 2. We use Firebase ID tokens on every API request (attached by axiosClient).
+      // No cookie/session exchange is performed. The app is stateless.
+      // The `onAuthStateChanged` listener below will set `currentUser`.
 
     } catch (error) {
       console.error("Login failed", error);
-      // If backend sync fails, sign out of Firebase to keep states consistent
+      // Ensure local/native Firebase sessions are cleared on error
       await signOut(auth);
       if (Capacitor.isNativePlatform()) {
         await FirebaseAuthentication.signOut();
@@ -70,9 +61,7 @@ export const AuthProvider = ({ children }) => {
         await FirebaseAuthentication.signOut(); // Clear native session
       }
       
-      // Optional: Call backend to clear cookie
-      // const API_URL = getBaseUrl();
-      // await axios.post(`${API_URL}/auth/logout`);
+      // Stateless mode: no server cookie to clear.
 
     } catch (error) {
       console.error("Logout failed", error);
