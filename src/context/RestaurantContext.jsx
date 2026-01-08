@@ -32,7 +32,7 @@ export const RestaurantProvider = ({ children }) => {
         ...filters,
       };
 
-      const response = await axiosClient.get(`/restaurants`, { params });
+      const response = await axiosClient.get(`/restaurants/`, { params });
       
       const formattedData = response.map(item => ({
         id: item.id,
