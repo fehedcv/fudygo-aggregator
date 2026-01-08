@@ -1,39 +1,86 @@
-import { createContext, useContext, useState, useCallback, useMemo } from 'react';
+import { createContext, useContext, useState, useCallback, useMemo, useEffect } from 'react';
+import axiosClient from '../api/axiosClient';
+import { useLocation } from './LocationContext';
 
 const RestaurantContext = createContext();
 
 export const useRestaurants = () => useContext(RestaurantContext);
 
 export const RestaurantProvider = ({ children }) => {
-  // Initialize state from LocalStorage
-  const [restaurants, setRestaurantsState] = useState(() => {
-    const saved = localStorage.getItem('fudygo_restaurants');
-    return saved ? JSON.parse(saved) : [];
+  const [restaurants, setRestaurants] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [filters, setFilters] = useState({
+    name: '',
+    min_rating: null,
+    sort_by: 'distance',
+    sort_order: 'asc',
   });
+  
+  const { coordinates } = useLocation();
 
-  // FIX 1: Wrap function in useCallback so it doesn't change on every render
-  const setRestaurants = useCallback((data) => {
-    setRestaurantsState(data);
-    localStorage.setItem('fudygo_restaurants', JSON.stringify(data));
-  }, []); // Empty dependency array = function never changes
+  const fetchRestaurants = useCallback(async () => {
+    if (!coordinates) return;
 
-  // FIX 2: Wrap helper in useCallback
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const params = {
+        latitude: coordinates.lat,
+        longitude: coordinates.lng,
+        ...filters,
+      };
+
+      const response = await axiosClient.get(`/restaurants`, { params });
+      
+      const formattedData = response.map(item => ({
+        id: item.id,
+        name: item.name,
+        address: item.address,
+        image: item.logo_url || "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&auto=format&fit=crop&q=60",
+        logo: item.logo_url || "https://cdn-icons-png.flaticon.com/512/732/732217.png",
+        rating: item.average_rating || 0, 
+        reviews: 100, // placeholder
+        distance: item.distance_km ? `${item.distance_km.toFixed(2)} km` : 'N/A',
+        time: "30-45 mins", // placeholder
+        deliveryFee: "£2.50", // placeholder
+        minOrder: "£10", // placeholder
+        discount: null, // placeholder
+        isPreOrder: false // placeholder
+      }));
+
+      setRestaurants(formattedData);
+    } catch (err) {
+      console.error("Error fetching restaurants:", err);
+      setError("Failed to load restaurants.");
+      setRestaurants([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [coordinates, filters]);
+
+  useEffect(() => {
+    fetchRestaurants();
+  }, [fetchRestaurants]);
+
+  const updateFilters = (newFilters) => {
+    setFilters(prev => ({ ...prev, ...newFilters }));
+  };
+
   const getRestaurantById = useCallback((id) => {
-    // Note: We use the functional update or ref if we needed live state inside, 
-    // but since we read from the state passed to Provider, we rely on the dependency below.
-    // However, to avoid 'restaurants' dependency causing re-creation, 
-    // we can keep it simple or use a ref. 
-    // For simplicity here, we allow it to update if restaurants change, 
-    // BUT since Home.jsx doesn't depend on this function, it breaks the loop for setRestaurants.
     return restaurants.find(r => r.id === parseInt(id));
   }, [restaurants]); 
 
-  // FIX 3: Memoize the value object so consumers don't re-render unnecessarily
   const value = useMemo(() => ({
     restaurants,
-    setRestaurants,
-    getRestaurantById
-  }), [restaurants, setRestaurants, getRestaurantById]);
+    loading,
+    error,
+    filters,
+    updateFilters,
+    fetchRestaurants,
+    getRestaurantById,
+  }), [restaurants, loading, error, filters, fetchRestaurants, getRestaurantById]);
 
   return (
     <RestaurantContext.Provider value={value}>
