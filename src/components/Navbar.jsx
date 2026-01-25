@@ -26,7 +26,6 @@ const Navbar = () => {
   const navLinks = [
     { name: 'Home', icon: Home, path: '/' },
     { name: 'Orders', icon: Receipt, path: '/orders' }, // New Link
-    { name: 'Reorder', icon: RotateCcw, path: '#' },
   ];
 
   return (
@@ -86,12 +85,11 @@ const Navbar = () => {
                     </div>
                 </Link>
               ) : (
-                <button 
-                    onClick={() => navigate('/cart')} 
-                    className="text-sm font-bold text-gray-700 hover:text-red-600"
-                >
-                    Log In
-                </button>
+                <Link to="/profile" className="flex items-center gap-2 pl-4 border-l border-gray-200">
+                    <div className="w-9 h-9 rounded-full bg-gray-100 overflow-hidden border border-gray-200 hover:border-red-400 transition-colors flex items-center justify-center">
+                        <User className="w-5 h-5 text-gray-400" />
+                    </div>
+                </Link>
               )}
             </div>
 
@@ -104,21 +102,6 @@ const Navbar = () => {
               <button onClick={() => setIsFilterOpen(true)} className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors">
                 <SlidersHorizontal className="w-6 h-6" />
               </button>
-
-              <Link to={currentUser ? "/profile" : "/cart"} className="p-2 text-gray-600 hover:text-red-600 transition-colors">
-                 {currentUser && currentUser.photoURL ? (
-                     <img src={currentUser.photoURL} className="w-6 h-6 rounded-full border border-gray-200" alt="User" />
-                 ) : (
-                     <User className="w-6 h-6" />
-                 )}
-              </Link>
-
-              <Link to="/cart" className="relative p-2 text-gray-600 hover:text-red-600 transition-colors">
-                <ShoppingBag className="w-6 h-6" />
-                {cartCount > 0 && (
-                  <span className="absolute top-0 right-0 flex items-center justify-center w-4 h-4 text-[10px] font-bold text-white bg-red-600 rounded-full border border-white">{cartCount}</span>
-                )}
-              </Link>
 
               <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-2 rounded-md text-gray-600 hover:text-red-600 hover:bg-gray-100 transition-colors">
                 {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -162,6 +145,45 @@ const Navbar = () => {
 
       <LocationModal isOpen={isLocationModalOpen} onClose={() => setIsLocationModalOpen(false)} onUpdateLocation={updateLocation} />
       <FilterDrawer isOpen={isFilterOpen} onClose={() => setIsFilterOpen(false)} />
+
+      {/* BOTTOM NAVBAR FOR MOBILE */}
+      <div className="xl:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
+        <div className="flex items-center justify-around h-16 px-2">
+          <Link to="/" className="flex flex-col items-center justify-center flex-1 py-2 text-gray-600 hover:text-red-600 transition-colors">
+            <Home className="w-6 h-6 mb-1" />
+            <span className="text-xs font-medium">Home</span>
+          </Link>
+          
+          <Link to="/orders" className="flex flex-col items-center justify-center flex-1 py-2 text-gray-600 hover:text-red-600 transition-colors">
+            <Receipt className="w-6 h-6 mb-1" />
+            <span className="text-xs font-medium">Orders</span>
+          </Link>
+          
+          <Link to="/cart" className="flex flex-col items-center justify-center flex-1 py-2 text-gray-600 hover:text-red-600 transition-colors relative">
+            <ShoppingBag className="w-6 h-6 mb-1" />
+            {cartCount > 0 && (
+              <span className="absolute top-1 right-1/2 translate-x-3 -translate-y-1 flex items-center justify-center w-5 h-5 text-[10px] font-bold text-white bg-red-600 rounded-full border-2 border-white">
+                {cartCount}
+              </span>
+            )}
+            <span className="text-xs font-medium">Cart</span>
+          </Link>
+          
+          <Link to={currentUser ? "/profile" : "/cart"} className="flex flex-col items-center justify-center flex-1 py-2 text-gray-600 hover:text-red-600 transition-colors">
+            {currentUser && currentUser.photoURL ? (
+              <>
+                <img src={currentUser.photoURL} className="w-6 h-6 rounded-full border border-gray-200 mb-1" alt="User" />
+                <span className="text-xs font-medium">Profile</span>
+              </>
+            ) : (
+              <>
+                <User className="w-6 h-6 mb-1" />
+                <span className="text-xs font-medium">Profile</span>
+              </>
+            )}
+          </Link>
+        </div>
+      </div>
     </>
   );
 };

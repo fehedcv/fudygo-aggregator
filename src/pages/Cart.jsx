@@ -3,23 +3,23 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import axiosClient from '../api/axiosClient';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, MapPin, Plus } from 'lucide-react';
 
 // Components
 import CartEmptyState from '../components/cart/CartEmptyState';
 import CartItems from '../components/cart/CartItems';
 import CheckoutSidebar from '../components/cart/CheckoutSidebar';
 import AddressModal from '../components/cart/AddressModal';
+import CartSkeleton from '../components/cart/CartSkeleton';
 
 const Cart = () => {
-  // Destructure clearCart from context
   const { cart, updateQuantity, removeFromCart, clearCart, getCartTotal, deliveryAddress, setDeliveryAddress } = useCart();
   const { currentUser, loginWithGoogle, logout } = useAuth();
   const navigate = useNavigate();
   
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [savedAddresses, setSavedAddresses] = useState([]);
-  const [loadingAddresses, setLoadingAddresses] = useState(false);
+  const [loadingAddresses, setLoadingAddresses] = useState(true);
   const [instructions, setInstructions] = useState('');
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
 
@@ -66,9 +66,24 @@ const Cart = () => {
 
   // --- HANDLE PLACE ORDER ---
   const handlePlaceOrder = async () => {
-    if (!deliveryAddress?.id) {
-        alert("Please select a delivery address.");
-        return;
+    // Check if user is logged in
+    if (!currentUser) {
+      alert("Please log in to place an order.");
+      return;
+    }
+
+    // Check if address is selected
+    if (!deliveryAddress?.id || deliveryAddress.id === 1) {
+      alert("Please select or add a delivery address.");
+      setIsAddressModalOpen(true);
+      return;
+    }
+
+    // Check if user has any saved addresses
+    if (savedAddresses.length === 0) {
+      alert("Please add a delivery address before placing an order.");
+      setIsAddressModalOpen(true);
+      return;
     }
 
     setIsPlacingOrder(true);
@@ -91,12 +106,8 @@ const Cart = () => {
         console.log("Order Placed:", response);
         
         alert("Order placed successfully!");
-        
-        // 1. Clear the cart
         clearCart();
-        
-        // 2. The component will re-render, see cart.items.length === 0, 
-        // and automatically show the <CartEmptyState /> component.
+        navigate('/orders');
         
     } catch (error) {
         console.error("Order Failed:", error);
@@ -108,23 +119,28 @@ const Cart = () => {
 
   if (cart.items.length === 0) return <CartEmptyState />;
 
+  if (loadingAddresses && currentUser) return <CartSkeleton />;
+
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8 font-sans">
-      <div className="max-w-5xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <Link to="/" className="text-gray-400 hover:text-red-600 transition-colors"><ArrowLeft className="w-6 h-6" /></Link>
-            Checkout
+    <div className="min-h-screen bg-gray-50 py-4 md:py-8 px-4 sm:px-6 lg:px-8 font-sans pb-24">
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-6">
+            <h1 className="text-xl md:text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <Link to="/" className="text-gray-400 hover:text-red-600 transition-colors">
+                <ArrowLeft className="w-5 h-5 md:w-6 md:h-6" />
+              </Link>
+              Checkout
             </h1>
             {currentUser && (
-                <div className="flex items-center gap-3">
-                    <img src={currentUser.photoURL} alt="User" className="w-8 h-8 rounded-full border border-gray-200" />
-                    <button onClick={logout} className="text-sm font-medium text-gray-500 hover:text-red-600">Sign Out</button>
+                <div className="flex items-center gap-2 md:gap-3">
+                    <img src={currentUser.photoURL} alt="User" className="w-7 h-7 md:w-8 md:h-8 rounded-full border border-gray-200" />
+                    <button onClick={logout} className="text-xs md:text-sm font-medium text-gray-500 hover:text-red-600 hidden sm:block">Sign Out</button>
                 </div>
             )}
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-8">
+        <div className="flex flex-col lg:flex-row gap-4 md:gap-6">
           <CartItems 
             cart={cart} 
             updateQuantity={updateQuantity} 
@@ -132,11 +148,12 @@ const Cart = () => {
             instructions={instructions}
             setInstructions={setInstructions}
           />
-          <div className="w-full lg:w-96 space-y-6">
+          <div className="w-full lg:w-96 space-y-4 md:space-y-6">
             <CheckoutSidebar 
               currentUser={currentUser}
               loginWithGoogle={loginWithGoogle}
               deliveryAddress={deliveryAddress}
+              savedAddresses={savedAddresses}
               onChangeAddress={() => setIsAddressModalOpen(true)}
               cartTotal={getCartTotal()}
               onPlaceOrder={handlePlaceOrder}

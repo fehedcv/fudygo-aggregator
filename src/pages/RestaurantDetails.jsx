@@ -1,19 +1,30 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useRestaurants } from '../context/RestaurantContext'; // Import Context
+import { useRestaurants } from '../context/RestaurantContext';
 import { useCart } from '../context/CartContext';
 import axiosClient from '../api/axiosClient';
-import { Star, Clock, MapPin, Info, ChevronDown, Bike, ShoppingBag, Loader2 } from 'lucide-react';
+import { Star, Clock, MapPin, Info, ChevronDown, Bike, ShoppingBag, Loader2, Plus, Minus } from 'lucide-react';
+import BottomCartBar from '../components/BottomCartBar';
+import AddToCartToast from '../components/AddToCartToast';
+import RestaurantDetailsSkeleton from '../components/SkeletonLoader';
 
 const RestaurantDetails = () => {
   const { id } = useParams();
-  const { addToCart } = useCart();
-  const { getRestaurantById } = useRestaurants(); // Get helper function
+  const { addToCart, updateQuantity, cart } = useCart();
+  const { getRestaurantById } = useRestaurants();
   
   // API State
   const [menuItems, setMenuItems] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showToast, setShowToast] = useState(false);
+  const [addedItemName, setAddedItemName] = useState('');
+
+  // Helper to get item quantity from cart
+  const getItemQuantity = (itemName) => {
+    const cartItem = cart.items.find(item => item.name === itemName);
+    return cartItem ? cartItem.quantity : 0;
+  };
 
   // 1. Get Basic Info from Context (persisted data)
   const restaurantInfo = getRestaurantById(id) || {
@@ -71,19 +82,24 @@ const RestaurantDetails = () => {
       image: item.image_url
     };
     addToCart(cartItem, id, restaurantInfo.name);
+    setAddedItemName(item.name);
+    setShowToast(true);
   };
 
-  if (loading && !restaurantInfo) {
-      return (
-          <div className="min-h-screen flex items-center justify-center bg-gray-50">
-              <Loader2 className="w-10 h-10 text-red-600 animate-spin" />
-          </div>
-      );
+  if (loading) {
+      return <RestaurantDetailsSkeleton />;
   }
 
   // ... (Rest of the UI remains the same as previous step) ...
   return (
-    <div className="bg-gray-50 min-h-screen pb-20">
+    <>
+      <AddToCartToast 
+        show={showToast} 
+        itemName={addedItemName} 
+        onClose={() => setShowToast(false)} 
+      />
+      <BottomCartBar />
+      <div className="bg-gray-50 min-h-screen pb-20">
       {/* Hero Section */}
       <div className="relative">
         <div className="h-64 md:h-80 w-full overflow-hidden">
@@ -136,21 +152,54 @@ const RestaurantDetails = () => {
            <div className="flex-1 space-y-8">
                 {availableCategories.map((category) => (
                   <div key={category} id={category} className="scroll-mt-24">
-                     <h2 className="text-xl font-bold text-gray-900 mb-4 uppercase tracking-wide">{category}</h2>
-                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {menuGrouped[category].map((item) => (
-                           <div key={item.id} className="bg-white p-4 rounded-lg border border-gray-100 hover:shadow-md transition-shadow flex justify-between items-start">
-                              <div className="flex-1 pr-2">
-                                 <h4 className="font-bold text-gray-800 mb-1 capitalize">{item.name}</h4>
+                     <div className="bg-gray-50 border-l-4 border-red-600 px-4 py-2.5 mb-4 rounded-r-lg">
+                       <h2 className="text-base font-bold text-gray-900 uppercase tracking-wide">{category}</h2>
+                       <p className="text-xs text-gray-500 mt-0.5">{menuGrouped[category].length} items</p>
+                     </div>
+                     <div className="grid grid-cols-1 gap-4">
+                        {menuGrouped[category].map((item) => {
+                          const quantity = getItemQuantity(item.name);
+                          return (
+                           <div key={item.id} className="bg-white p-4 rounded-xl border border-gray-100 hover:shadow-lg transition-all flex justify-between items-start gap-4">
+                              <div className="flex-1">
+                                 <h4 className="font-bold text-gray-900 mb-1 text-sm capitalize">{item.name}</h4>
                                  {item.description && <p className="text-xs text-gray-500 mb-2 line-clamp-2">{item.description}</p>}
                                  <span className="text-sm font-bold text-gray-900">₹{item.price}</span>
                               </div>
-                              <div className="flex flex-col items-center gap-2">
-                                  {item.image_url && <img src={item.image_url} alt={item.name} className="w-20 h-20 rounded-lg object-cover border border-gray-100" />}
-                                  <button onClick={() => handleAddToCart(item)} className="w-full py-1.5 bg-white text-green-600 border border-green-200 rounded-lg text-xs font-bold hover:bg-green-50 transition-colors">ADD</button>
+                              <div className="flex flex-col items-end gap-2 flex-shrink-0">
+                                  {item.image_url && (
+                                    <div className="relative">
+                                      <img src={item.image_url} alt={item.name} className="w-24 h-24 rounded-lg object-cover border border-gray-200" />
+                                    </div>
+                                  )}
+                                  {quantity === 0 ? (
+                                    <button 
+                                      onClick={() => handleAddToCart(item)} 
+                                      className="px-6 py-1.5 bg-white text-red-600 border-2 border-red-500 rounded-lg text-xs font-bold hover:bg-red-50 transition-all shadow-sm"
+                                    >
+                                      ADD
+                                    </button>
+                                  ) : (
+                                    <div className="flex items-center gap-2 bg-red-50 border-2 border-red-500 rounded-lg px-2 py-1">
+                                      <button
+                                        onClick={() => updateQuantity(item.name, -1)}
+                                        className="w-6 h-6 flex items-center justify-center bg-white text-red-600 rounded hover:bg-red-100 transition-colors"
+                                      >
+                                        <Minus className="w-3 h-3" strokeWidth={3} />
+                                      </button>
+                                      <span className="text-sm font-bold text-red-700 min-w-[20px] text-center">{quantity}</span>
+                                      <button
+                                        onClick={() => handleAddToCart(item)}
+                                        className="w-6 h-6 flex items-center justify-center bg-white text-red-600 rounded hover:bg-red-100 transition-colors"
+                                      >
+                                        <Plus className="w-3 h-3" strokeWidth={3} />
+                                      </button>
+                                    </div>
+                                  )}
                               </div>
                            </div>
-                        ))}
+                          );
+                        })}
                      </div>
                   </div>
                 ))}
@@ -158,6 +207,7 @@ const RestaurantDetails = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

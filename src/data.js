@@ -1,11 +1,11 @@
 // src/data.js
 export const categories = [
-  { name: 'Groceries', image: 'https://cdn-icons-png.flaticon.com/512/3081/3081559.png' },
-  { name: 'Burgers', image: 'https://cdn-icons-png.flaticon.com/512/3075/3075977.png' },
-  { name: 'Pizza', image: 'https://cdn-icons-png.flaticon.com/512/1404/1404945.png' },
-  { name: 'Kebab', image: 'https://cdn-icons-png.flaticon.com/512/933/933310.png' },
-  { name: 'Fish & Chips', image: 'https://cdn-icons-png.flaticon.com/512/2819/2819194.png' },
-  { name: 'Curry', image: 'https://cdn-icons-png.flaticon.com/512/2276/2276931.png' },
+  { name: 'Groceries', image: '/grocery.png' },
+  { name: 'Burgers', image: '/burger.png' },
+  { name: 'Pizza', image: '/pizza.png' },
+  { name: 'Kebab', image: '/kebab.png' },
+  { name: 'Grill', image: '/grill.png' },
+  { name: 'Curry', image: '/curry.png' },
 ];
 export const restaurants = [
   {

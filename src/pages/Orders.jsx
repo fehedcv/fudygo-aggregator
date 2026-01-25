@@ -5,11 +5,11 @@ import { useAuth } from '../context/AuthContext';
 import { useRestaurants } from '../context/RestaurantContext'; // To look up restaurant names
 import { 
   Package, Clock, CheckCircle, XCircle, ChevronRight, 
-  MapPin, Calendar, Receipt, ShoppingBag, ArrowLeft, Loader2, RotateCcw
+  MapPin, Calendar, Receipt, ShoppingBag, ArrowLeft, Loader2, RotateCcw, LogIn
 } from 'lucide-react';
 
 const Orders = () => {
-  const { currentUser } = useAuth();
+  const { currentUser, loginWithGoogle } = useAuth();
   const { getRestaurantById } = useRestaurants();
   const navigate = useNavigate();
   
@@ -18,7 +18,7 @@ const Orders = () => {
 
   useEffect(() => {
     if (!currentUser) {
-      navigate('/');
+      setLoading(false);
       return;
     }
 
@@ -36,7 +36,37 @@ const Orders = () => {
     };
 
     fetchOrders();
-  }, [currentUser, navigate]);
+  }, [currentUser]);
+
+  // Show login prompt if not logged in
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 max-w-sm w-full text-center">
+          <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Receipt className="w-8 h-8 text-red-600" />
+          </div>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">View Your Orders</h2>
+          <p className="text-sm text-gray-500 mb-6">Sign in to see your orders</p>
+          
+          <button
+            onClick={loginWithGoogle}
+            className="w-full bg-red-600 text-white font-semibold py-3 rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center gap-2 mb-3"
+          >
+            <LogIn className="w-4 h-4" />
+            Sign in with Google
+          </button>
+          
+          <button
+            onClick={() => navigate('/')}
+            className="w-full text-gray-500 text-sm py-2 hover:text-gray-700"
+          >
+            Back to Home
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // Helper: Status Color & Icon
   const getStatusBadge = (status) => {

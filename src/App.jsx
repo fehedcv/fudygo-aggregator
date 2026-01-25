@@ -1,5 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
+import WelcomeModal from './components/WelcomeModal';
 import Home from './pages/Home';
 import RestaurantDetails from './pages/RestaurantDetails';
 import Cart from './pages/Cart';
@@ -10,17 +11,20 @@ import PhoneVerify from './pages/PhoneVerify';
 function App() {
   return (
     <div className="min-h-screen bg-white font-sans text-gray-800">
+      <WelcomeModal />
       <Navbar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/restaurant/:id" element={<RestaurantDetails />} />
-        <Route path="/cart" element={<Cart />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/verify-phone" element={<PhoneVerify />} />
-        
-        {/* 2. Add the Route here */}
-        <Route path="/orders" element={<Orders />} /> 
-      </Routes>
+      <div className="pb-20 xl:pb-0">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/restaurant/:id" element={<RestaurantDetails />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/verify-phone" element={<PhoneVerify />} />
+          
+          {/* 2. Add the Route here */}
+          <Route path="/orders" element={<Orders />} /> 
+        </Routes>
+      </div>
     </div>
   );
 }
