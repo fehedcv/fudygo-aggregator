@@ -4,6 +4,8 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import axiosClient from '../api/axiosClient';
 import { ArrowLeft, MapPin, Plus } from 'lucide-react';
+import Confetti from 'react-confetti';
+import { useWindowSize } from 'react-use';
 
 // Components
 import CartEmptyState from '../components/cart/CartEmptyState';
@@ -22,6 +24,8 @@ const Cart = () => {
   const [loadingAddresses, setLoadingAddresses] = useState(true);
   const [instructions, setInstructions] = useState('');
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const { width, height } = useWindowSize();
 
   // ... (Keep existing useEffect for fetching addresses) ...
   useEffect(() => {
@@ -105,9 +109,16 @@ const Cart = () => {
         const response = await axiosClient.post('/orders/', orderPayload);
         console.log("Order Placed:", response);
         
-        alert("Order placed successfully!");
-        clearCart();
-        navigate('/orders');
+        // Trigger confetti celebration
+        setShowConfetti(true);
+        setTimeout(() => setShowConfetti(false), 5000);
+        
+        // Show success message after brief delay
+        setTimeout(() => {
+          alert("Order placed successfully!");
+          clearCart();
+          navigate('/orders');
+        }, 1000);
         
     } catch (error) {
         console.error("Order Failed:", error);
@@ -122,7 +133,17 @@ const Cart = () => {
   if (loadingAddresses && currentUser) return <CartSkeleton />;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-4 md:py-8 px-4 sm:px-6 lg:px-8 font-sans pb-24">
+    <>
+      {showConfetti && (
+        <Confetti
+          width={width}
+          height={height}
+          recycle={false}
+          numberOfPieces={500}
+          gravity={0.3}
+        />
+      )}
+      <div className="min-h-screen bg-gray-50 py-4 md:py-8 px-4 sm:px-6 lg:px-8 font-sans pb-24">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
@@ -171,7 +192,8 @@ const Cart = () => {
         selectedId={deliveryAddress?.id}
         onSelect={handleAddressSelect}
       />
-    </div>
+      </div>
+    </>
   );
 };
 

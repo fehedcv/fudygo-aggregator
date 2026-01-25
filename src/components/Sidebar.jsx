@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { Car, ShoppingBag, Star } from 'lucide-react';
+import { Car, ShoppingBag, Star, Truck, Store } from 'lucide-react';
 import { useRestaurants } from '../context/RestaurantContext';
 import { categories } from '../data';
 
 const Sidebar = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [orderType, setOrderType] = useState('delivery');
   const { filters, updateFilters } = useRestaurants();
 
   const onCategoryClick = (cat) => {
@@ -12,7 +13,36 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="hidden lg:block w-64 flex-shrink-0 space-y-8 pr-4">
+    <div className="hidden lg:block w-64 flex-shrink-0">
+      <div className="sticky top-24 space-y-8 pr-4">
+        {/* Delivery/Pickup Toggle */}
+        <div>
+          <h3 className="font-bold text-gray-900 mb-3">Takeaways in</h3>
+          <div className="inline-flex items-center bg-gray-100 rounded-full p-1 w-full">
+            <button
+              onClick={() => setOrderType('delivery')}
+              className={`flex-1 px-4 py-2.5 rounded-full font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2 ${
+                orderType === 'delivery'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'bg-transparent text-gray-600'
+              }`}
+            >
+              <Truck className="w-4 h-4" />
+              Delivery
+            </button>
+            <button
+              onClick={() => setOrderType('pickup')}
+              className={`flex-1 px-4 py-2.5 rounded-full font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2 ${
+                orderType === 'pickup'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'bg-transparent text-gray-600'
+              }`}
+            >
+              <Store className="w-4 h-4" />
+              Pickup
+            </button>
+          </div>
+        </div>
       {/* Filter Section */}
       <div>
         <h3 className="font-bold text-gray-900 mb-3">Filter</h3>
@@ -55,6 +85,7 @@ const Sidebar = () => {
             </div>
           ))}
         </div>
+      </div>
       </div>
     </div>
   );

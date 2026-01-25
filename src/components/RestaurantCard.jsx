@@ -1,17 +1,35 @@
 // src/components/RestaurantCard.jsx
 import { Link } from 'react-router-dom';
 import { Star, MapPin } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { useInView } from 'react-intersection-observer';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+import 'react-lazy-load-image-component/src/effects/blur.css';
 
-const RestaurantCard = ({ data }) => {
+const RestaurantCard = ({ data, index = 0 }) => {
+  const { ref, inView } = useInView({
+    triggerOnce: true,
+    threshold: 0.1,
+  });
+
   return (
-    <Link to={`/restaurant/${data.id}`} className="block h-full">
-      <div className="bg-white rounded-xl overflow-hidden border border-gray-100 hover:shadow-lg transition-all duration-300 h-full flex flex-col group">
+    <div ref={ref}>
+      <Link to={`/restaurant/${data.id}`} className="block h-full">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.4, delay: index * 0.05 }}
+          whileHover={{ y: -8, boxShadow: "0 20px 40px rgba(0,0,0,0.1)" }}
+          className="bg-white rounded-xl overflow-hidden border border-gray-100 h-full flex flex-col group"
+        >
         
         {/* --- Image Section --- */}
         <div className="relative h-32 lg:h-36 overflow-hidden">
-          <img
+          <LazyLoadImage
             src={data.image} 
-            alt={data.name} 
+            alt={data.name}
+            effect="blur"
+            wrapperClassName="w-full h-full"
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
           
@@ -45,8 +63,9 @@ const RestaurantCard = ({ data }) => {
           </div>
 
         </div>
-      </div>
-    </Link>
+      </motion.div>
+      </Link>
+    </div>
   );
 };
 

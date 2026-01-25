@@ -31,32 +31,6 @@ const Home = () => {
       <div className="flex flex-col lg:flex-row gap-8">
         <Sidebar />
         <div className="flex-1 min-w-0">
-          {/* Delivery/Pickup Toggle */}
-          <div className="inline-flex items-center bg-gray-100 rounded-full p-1 mb-6 w-full lg:w-auto">
-            <button
-              onClick={() => setOrderType('delivery')}
-              className={`flex-1 lg:flex-none lg:px-8 py-2.5 rounded-full font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2 ${
-                orderType === 'delivery'
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'bg-transparent text-gray-600'
-              }`}
-            >
-              <Truck className="w-4 h-4" />
-              Delivery
-            </button>
-            <button
-              onClick={() => setOrderType('pickup')}
-              className={`flex-1 lg:flex-none lg:px-8 py-2.5 rounded-full font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2 ${
-                orderType === 'pickup'
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'bg-transparent text-gray-600'
-              }`}
-            >
-              <Store className="w-4 h-4" />
-              Pickup
-            </button>
-          </div>
-
           {/* Search Bar */}
           <div className="relative mb-6">
             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -84,8 +58,8 @@ const Home = () => {
             <div className="text-center py-20 text-gray-500">No restaurants found.</div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-3">
-              {restaurants.map((restaurant) => (
-                <RestaurantCard key={restaurant.id} data={restaurant} />
+              {restaurants.map((restaurant, index) => (
+                <RestaurantCard key={restaurant.id} data={restaurant} index={index} />
               ))}
             </div>
           )}

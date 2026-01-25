@@ -5,8 +5,10 @@ import { useCart } from '../context/CartContext';
 import axiosClient from '../api/axiosClient';
 import { Star, Clock, MapPin, Info, ChevronDown, Bike, ShoppingBag, Loader2, Plus, Minus } from 'lucide-react';
 import BottomCartBar from '../components/BottomCartBar';
-import AddToCartToast from '../components/AddToCartToast';
+import toast, { Toaster } from 'react-hot-toast';
 import RestaurantDetailsSkeleton from '../components/SkeletonLoader';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+import 'react-lazy-load-image-component/src/effects/blur.css';
 
 const RestaurantDetails = () => {
   const { id } = useParams();
@@ -17,8 +19,6 @@ const RestaurantDetails = () => {
   const [menuItems, setMenuItems] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showToast, setShowToast] = useState(false);
-  const [addedItemName, setAddedItemName] = useState('');
 
   // Helper to get item quantity from cart
   const getItemQuantity = (itemName) => {
@@ -82,8 +82,18 @@ const RestaurantDetails = () => {
       image: item.image_url
     };
     addToCart(cartItem, id, restaurantInfo.name);
-    setAddedItemName(item.name);
-    setShowToast(true);
+    toast.success(`${item.name} added to cart!`, {
+      icon: '🛒',
+      style: {
+        borderRadius: '12px',
+        background: '#1f2937',
+        color: '#fff',
+        padding: '12px 20px',
+        fontSize: '14px',
+        fontWeight: '500',
+      },
+      duration: 2000,
+    });
   };
 
   if (loading) {
@@ -93,17 +103,19 @@ const RestaurantDetails = () => {
   // ... (Rest of the UI remains the same as previous step) ...
   return (
     <>
-      <AddToCartToast 
-        show={showToast} 
-        itemName={addedItemName} 
-        onClose={() => setShowToast(false)} 
-      />
+      <Toaster position="bottom-center" />
       <BottomCartBar />
       <div className="bg-gray-50 min-h-screen pb-20">
       {/* Hero Section */}
       <div className="relative">
         <div className="h-64 md:h-80 w-full overflow-hidden">
-          <img src={restaurantInfo.image} alt={restaurantInfo.name} className="w-full h-full object-cover brightness-75" />
+          <LazyLoadImage
+            src={restaurantInfo.image}
+            alt={restaurantInfo.name}
+            effect="blur"
+            wrapperClassName="w-full h-full"
+            className="w-full h-full object-cover brightness-75"
+          />
         </div>
         
         {/* ... Info Card Logic ... */}
@@ -111,7 +123,12 @@ const RestaurantDetails = () => {
           <div className="bg-white rounded-xl shadow-xl p-6 md:p-8 relative">
             {/* Logo */}
             <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-white p-2 rounded-xl shadow-md">
-              <img src={restaurantInfo.logo} alt="Logo" className="w-16 h-16 object-contain" />
+              <LazyLoadImage
+                src={restaurantInfo.logo}
+                alt="Logo"
+                effect="blur"
+                className="w-16 h-16 object-contain"
+              />
             </div>
             
             {/* Name & Address from Context */}
