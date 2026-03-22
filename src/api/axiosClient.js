@@ -15,13 +15,8 @@ import { auth } from '../firebase';
 const BASE_URL =
   import.meta.env.VITE_API_URL || 'https://fudygo-akfbczbwbdg3cydc.southeastasia-01.azurewebsites.net';
 
-// ----------------------------------------------------
-// AXIOS INSTANCE
-// ----------------------------------------------------
-
 const axiosClient = axios.create({
   baseURL: BASE_URL,
-  // Stateless token-based auth: do NOT use cookies or withCredentials
   headers: {
     'Content-Type': 'application/json',
   },
@@ -31,19 +26,16 @@ const axiosClient = axios.create({
 // REQUEST INTERCEPTOR
 // ----------------------------------------------------
 // Attach Firebase ID token as a Bearer token for authenticated requests.
-// This centralizes the logic so callers do not need to manage tokens manually.
 axiosClient.interceptors.request.use(
   async (config) => {
     try {
       const user = auth.currentUser;
       if (user) {
-        // Non-forced retrieval: uses cached token when valid.
         const token = await user.getIdToken();
         if (!config.headers) config.headers = {};
         config.headers.Authorization = `Bearer ${token}`;
       }
     } catch (e) {
-      // If token fetch fails, proceed without Authorization header.
       console.warn('Failed to attach Firebase token to request', e);
     }
     return config;
@@ -54,7 +46,7 @@ axiosClient.interceptors.request.use(
 // ----------------------------------------------------
 // RESPONSE INTERCEPTOR
 // ----------------------------------------------------
-// On 401: try a single token refresh (getIdToken(true)) and retry the request once.
+// On 401: try a single token refresh and retry the request once.
 axiosClient.interceptors.response.use(
   (response) => response.data,
   async (error) => {
@@ -67,14 +59,12 @@ axiosClient.interceptors.response.use(
       try {
         const user = auth.currentUser;
         if (user) {
-          // Force refresh token and retry
           const freshToken = await user.getIdToken(true);
           if (!originalRequest.headers) originalRequest.headers = {};
           originalRequest.headers.Authorization = `Bearer ${freshToken}`;
           return axiosClient(originalRequest);
         }
       } catch (retryError) {
-        // If refresh or retry fails, fall through and reject
         console.warn('Token refresh and retry failed', retryError);
       }
     }
