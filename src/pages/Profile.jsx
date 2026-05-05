@@ -54,15 +54,15 @@ const Profile = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 max-w-sm w-full text-center">
-          <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
-            <User className="w-8 h-8 text-red-600" />
+          <div className="w-16 h-16 bg-yellow-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <User className="w-8 h-8 text-yellow-600" />
           </div>
           <h2 className="text-xl font-bold text-gray-900 mb-2">Your Profile</h2>
           <p className="text-sm text-gray-500 mb-6">Sign in to manage your profile</p>
           
           <button
             onClick={loginWithGoogle}
-            className="w-full bg-red-600 text-white font-semibold py-3 rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center gap-2 mb-3"
+            className="w-full bg-slate-700 text-white font-semibold py-3 rounded-lg hover:bg-slate-800 transition-colors flex items-center justify-center gap-2 mb-3"
           >
             <LogIn className="w-4 h-4" />
             Sign in with Google
@@ -190,20 +190,20 @@ const Profile = () => {
         
         {/* Header */}
         <div className="flex items-center justify-between">
-            <Link to="/" className="flex items-center text-gray-500 hover:text-red-600 transition-colors">
+            <Link to="/" className="flex items-center text-gray-500 hover:text-slate-700 transition-colors">
                 <ArrowLeft className="w-5 h-5 mr-2" /> Back
             </Link>
             <h1 className="text-2xl font-bold text-gray-900">My Profile</h1>
-            <button onClick={logout} className="text-sm font-bold text-red-600 hover:bg-red-50 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-2">
+            <button onClick={logout} className="text-sm font-bold text-slate-700 hover:bg-yellow-50 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-2">
                 <LogOut className="w-4 h-4" /> Sign Out
             </button>
         </div>
 
         {/* Orders Shortcut */}
-        <Link to="/orders" className="block bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:border-red-200 hover:shadow-md transition-all group">
+        <Link to="/orders" className="block bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:border-yellow-200 hover:shadow-md transition-all group">
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                    <div className="p-3 bg-red-50 text-red-600 rounded-full group-hover:scale-110 transition-transform">
+                    <div className="p-3 bg-yellow-50 text-yellow-600 rounded-full group-hover:scale-110 transition-transform">
                         <Receipt className="w-6 h-6" />
                     </div>
                     <div>
@@ -211,7 +211,7 @@ const Profile = () => {
                         <p className="text-sm text-gray-500">View past orders and reorder</p>
                     </div>
                 </div>
-                <div className="bg-gray-50 p-2 rounded-full text-gray-400 group-hover:bg-red-600 group-hover:text-white transition-colors">
+                <div className="bg-gray-50 p-2 rounded-full text-gray-400 group-hover:bg-slate-700 group-hover:text-white transition-colors">
                     <ArrowLeft className="w-5 h-5 rotate-180" />
                 </div>
             </div>
@@ -232,9 +232,9 @@ const Profile = () => {
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
             <div className="flex justify-between items-center mb-6">
                 <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                    <MapPin className="w-5 h-5 text-red-600" /> Saved Addresses
+                    <MapPin className="w-5 h-5 text-yellow-600" /> Saved Addresses
                 </h3>
-                <button onClick={() => setShowAddressForm(!showAddressForm)} className="text-sm font-bold text-red-600 hover:bg-red-50 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1">
+                <button onClick={() => setShowAddressForm(!showAddressForm)} className="text-sm font-bold text-slate-700 hover:bg-yellow-50 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1">
                     <Plus className="w-4 h-4" /> Add New
                 </button>
             </div>
@@ -244,13 +244,13 @@ const Profile = () => {
                 <form onSubmit={handleAddAddress} className="mb-6 p-4 bg-gray-50 rounded-xl border border-gray-200 animate-in fade-in slide-in-from-top-2">
                     
                     {/* GPS Button */}
-                    <button type="button" onClick={handleUseCurrentLocation} disabled={isFetchingLocation} className="w-full mb-4 flex items-center justify-center gap-2 bg-red-100 text-red-700 font-bold py-2.5 rounded-lg hover:bg-red-200 transition-colors">
+                    <button type="button" onClick={handleUseCurrentLocation} disabled={isFetchingLocation} className="w-full mb-4 flex items-center justify-center gap-2 bg-yellow-100 text-slate-700 font-bold py-2.5 rounded-lg hover:bg-yellow-200 transition-colors">
                         {isFetchingLocation ? <Loader2 className="w-4 h-4 animate-spin" /> : <Crosshair className="w-4 h-4" />}
                         Use Current Location
                     </button>
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
-                        <select value={newAddress.label} onChange={(e) => setNewAddress({...newAddress, label: e.target.value})} className="p-2.5 rounded-lg border border-gray-300 text-sm outline-none focus:border-red-500">
+                        <select value={newAddress.label} onChange={(e) => setNewAddress({...newAddress, label: e.target.value})} className="p-2.5 rounded-lg border border-gray-300 text-sm outline-none focus:border-yellow-500">
                             <option>Home</option>
                             <option>Work</option>
                             <option>Other</option>
@@ -263,7 +263,7 @@ const Profile = () => {
                                 placeholder="Search area (e.g. Kottakkal)"
                                 value={newAddress.address}
                                 onChange={(e) => setNewAddress({...newAddress, address: e.target.value})}
-                                className="w-full p-2.5 pr-10 rounded-lg border border-gray-300 text-sm outline-none focus:border-red-500"
+                                className="w-full p-2.5 pr-10 rounded-lg border border-gray-300 text-sm outline-none focus:border-yellow-500"
                                 required
                             />
                             {isSearching && <Loader2 className="w-4 h-4 text-gray-400 animate-spin absolute right-3 top-3" />}
@@ -275,7 +275,7 @@ const Profile = () => {
                                         <li 
                                             key={idx} 
                                             onClick={() => handleSelectSuggestion(place)}
-                                            className="p-3 text-sm hover:bg-red-50 cursor-pointer border-b border-gray-50 last:border-none"
+                                            className="p-3 text-sm hover:bg-yellow-50 cursor-pointer border-b border-gray-50 last:border-none"
                                         >
                                             <strong className="block text-gray-800">{place.name || place.display_name.split(',')[0]}</strong>
                                             <span className="text-xs text-gray-500 line-clamp-1">{place.display_name}</span>
@@ -296,15 +296,15 @@ const Profile = () => {
             {/* Address List */}
             <div className="space-y-3">
                 {addresses.map((addr) => (
-                    <div key={addr.id} className="flex items-start justify-between p-4 border border-gray-100 rounded-xl hover:border-red-100 transition-all">
+                    <div key={addr.id} className="flex items-start justify-between p-4 border border-gray-100 rounded-xl hover:border-yellow-200 transition-all">
                         <div className="flex gap-3">
-                            <div className="mt-0.5 p-2 bg-red-50 text-red-600 rounded-full"><MapPin className="w-4 h-4" /></div>
+                            <div className="mt-0.5 p-2 bg-yellow-50 text-yellow-600 rounded-full"><MapPin className="w-4 h-4" /></div>
                             <div>
                                 <span className="text-sm font-bold text-gray-900 capitalize block">{addr.label}</span>
                                 <span className="text-sm text-gray-500">{addr.formatted_address || addr.address}</span>
                             </div>
                         </div>
-                        <button onClick={() => handleDeleteAddress(addr.id)} className="p-2 text-gray-300 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"><Trash2 className="w-4 h-4" /></button>
+                        <button onClick={() => handleDeleteAddress(addr.id)} className="p-2 text-gray-300 hover:text-slate-700 hover:bg-yellow-50 rounded-lg transition-colors"><Trash2 className="w-4 h-4" /></button>
                     </div>
                 ))}
             </div>

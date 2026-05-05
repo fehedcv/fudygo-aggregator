@@ -36,12 +36,14 @@ function App() {
   // eliminating the first-scroll jank
   useLayoutEffect(() => {
     const lenis = new Lenis({
-      duration: 1.2,
+      duration: 1.0,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smooth: true,
       smoothTouch: false,
       touchMultiplier: 1.5,
       infinite: false,
+      syncTouch: false,
+      syncTouchLerp: 0.1,
     });
 
     lenisInstance = lenis;
@@ -55,12 +57,14 @@ function App() {
     rafId.current = requestAnimationFrame(raf);
 
     // Preload critical resources
-    requestIdleCallback(() => {
-      const link = document.createElement('link');
-      link.rel = 'preconnect';
-      link.href = 'https://images.unsplash.com';
-      document.head.appendChild(link);
-    });
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(() => {
+        const link = document.createElement('link');
+        link.rel = 'preconnect';
+        link.href = 'https://images.unsplash.com';
+        document.head.appendChild(link);
+      });
+    }
 
     return () => {
       if (rafId.current) {

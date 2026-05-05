@@ -69,7 +69,7 @@ const Sidebar = () => {
       <div>
         <div className="flex justify-between items-center mb-4">
           <h3 className="font-bold text-gray-900">What's On Your Mind?</h3>
-          <button className="text-sm text-blue-500 hover:text-blue-600 font-medium">More</button>
+          <button className="text-sm text-slate-600 hover:text-slate-700 font-medium">More</button>
         </div>
         <div className="grid grid-cols-3 gap-4">
           {categories.map((cat, idx) => (

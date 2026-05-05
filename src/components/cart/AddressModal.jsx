@@ -176,7 +176,7 @@ const AddressModal = ({ isOpen, onClose, addresses, loading, selectedId, onSelec
                 type="button" 
                 onClick={handleUseCurrentLocation} 
                 disabled={isFetchingLocation} 
-                className="w-full flex items-center justify-center gap-2 bg-red-50 text-red-700 font-bold py-3 rounded-xl hover:bg-red-100 transition-colors border border-red-100"
+                className="w-full flex items-center justify-center gap-2 bg-yellow-50 text-slate-700 font-bold py-3 rounded-xl hover:bg-yellow-100 transition-colors border border-yellow-100"
               >
                 {isFetchingLocation ? <Loader2 className="w-4 h-4 animate-spin" /> : <Crosshair className="w-4 h-4" />}
                 Use Current Location
@@ -192,7 +192,7 @@ const AddressModal = ({ isOpen, onClose, addresses, loading, selectedId, onSelec
               <select 
                 value={newAddress.label} 
                 onChange={(e) => setNewAddress({...newAddress, label: e.target.value})} 
-                className="w-full p-3 rounded-xl border border-gray-200 text-sm outline-none focus:border-red-500 focus:ring-1 focus:ring-red-100 bg-white font-medium"
+                className="w-full p-3 rounded-xl border border-gray-200 text-sm outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-100 bg-white font-medium"
               >
                 <option>Home</option>
                 <option>Work</option>
@@ -209,7 +209,7 @@ const AddressModal = ({ isOpen, onClose, addresses, loading, selectedId, onSelec
                   placeholder="Search area (e.g. Kottakkal)"
                   value={newAddress.address}
                   onChange={(e) => setNewAddress({...newAddress, address: e.target.value})}
-                  className="w-full p-3 pl-10 pr-10 rounded-xl border border-gray-200 text-sm outline-none focus:border-red-500 focus:ring-1 focus:ring-red-100"
+                  className="w-full p-3 pl-10 pr-10 rounded-xl border border-gray-200 text-sm outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-100"
                   required
                 />
                 {isSearching && <Loader2 className="w-4 h-4 text-gray-400 animate-spin absolute right-3 top-3.5" />}
@@ -221,7 +221,7 @@ const AddressModal = ({ isOpen, onClose, addresses, loading, selectedId, onSelec
                       <li 
                         key={idx} 
                         onClick={() => handleSelectSuggestion(place)}
-                        className="p-3 text-sm hover:bg-red-50 cursor-pointer border-b border-gray-50 last:border-none"
+                        className="p-3 text-sm hover:bg-yellow-50 cursor-pointer border-b border-gray-50 last:border-none"
                       >
                         <strong className="block text-gray-800">{place.name || place.display_name.split(',')[0]}</strong>
                         <span className="text-xs text-gray-500 line-clamp-1">{place.display_name}</span>
@@ -251,7 +251,7 @@ const AddressModal = ({ isOpen, onClose, addresses, loading, selectedId, onSelec
                 <button 
                   type="submit" 
                   disabled={isSaving}
-                  className="flex-1 px-4 py-3 text-sm bg-red-600 text-white rounded-xl hover:bg-red-700 font-bold transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="flex-1 px-4 py-3 text-sm bg-slate-700 text-white rounded-xl hover:bg-slate-800 font-bold transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
                   Save Address
@@ -263,7 +263,7 @@ const AddressModal = ({ isOpen, onClose, addresses, loading, selectedId, onSelec
             <>
               {loading ? (
                 <div className="flex justify-center py-8">
-                  <Loader2 className="w-8 h-8 text-red-600 animate-spin" />
+                  <Loader2 className="w-8 h-8 text-slate-700 animate-spin" />
                 </div>
               ) : addresses.length === 0 ? (
                 <div className="text-center py-6 text-gray-500">
@@ -275,14 +275,14 @@ const AddressModal = ({ isOpen, onClose, addresses, loading, selectedId, onSelec
                   <div
                     key={addr.id}
                     onClick={() => onSelect(addr)}
-                    className={`cursor-pointer p-4 rounded-xl border flex items-center justify-between group transition-all ${selectedId === addr.id ? 'border-red-500 bg-red-50 ring-1 ring-red-500' : 'border-gray-200 hover:border-red-300 hover:shadow-md bg-white'}`}
+                    className={`cursor-pointer p-4 rounded-xl border flex items-center justify-between group transition-all ${selectedId === addr.id ? 'border-yellow-500 bg-yellow-50 ring-1 ring-yellow-500' : 'border-gray-200 hover:border-yellow-300 hover:shadow-md bg-white'}`}
                   >
                     <div className="flex items-center gap-4">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors ${selectedId === addr.id ? 'bg-red-200 text-red-700' : 'bg-gray-100 text-gray-600 group-hover:bg-red-100 group-hover:text-red-600'}`}>
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors ${selectedId === addr.id ? 'bg-yellow-200 text-slate-700' : 'bg-gray-100 text-gray-600 group-hover:bg-yellow-100 group-hover:text-yellow-600'}`}>
                         {getIcon(addr.label)}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h4 className={`font-bold text-sm capitalize ${selectedId === addr.id ? 'text-red-900' : 'text-gray-800'}`}>
+                        <h4 className={`font-bold text-sm capitalize ${selectedId === addr.id ? 'text-slate-900' : 'text-gray-800'}`}>
                           {addr.label}
                         </h4>
                         <p className="text-xs text-gray-500 mt-0.5 truncate">
@@ -291,8 +291,8 @@ const AddressModal = ({ isOpen, onClose, addresses, loading, selectedId, onSelec
                       </div>
                     </div>
                     {selectedId === addr.id && (
-                      <div className="text-red-600 bg-white rounded-full p-1 shadow-sm">
-                        <CheckCircle2 className="w-5 h-5 fill-red-600 text-white" />
+                      <div className="text-yellow-600 bg-white rounded-full p-1 shadow-sm">
+                        <CheckCircle2 className="w-5 h-5 fill-yellow-600 text-white" />
                       </div>
                     )}
                   </div>
@@ -301,7 +301,7 @@ const AddressModal = ({ isOpen, onClose, addresses, loading, selectedId, onSelec
 
               <button 
                 onClick={() => setShowForm(true)}
-                className="w-full py-4 border-2 border-dashed border-gray-200 rounded-xl flex items-center justify-center gap-2 text-gray-500 font-semibold hover:border-red-300 hover:text-red-600 hover:bg-red-50 transition-all group"
+                className="w-full py-4 border-2 border-dashed border-gray-200 rounded-xl flex items-center justify-center gap-2 text-gray-500 font-semibold hover:border-yellow-300 hover:text-slate-700 hover:bg-yellow-50 transition-all group"
               >
                 <Plus className="w-5 h-5 group-hover:scale-110 transition-transform" />
                 Add New Address

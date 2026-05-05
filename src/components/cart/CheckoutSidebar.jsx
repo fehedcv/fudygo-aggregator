@@ -21,8 +21,8 @@ const CheckoutSidebar = ({
   if (!currentUser) {
     return (
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 text-center sticky top-4">
-        <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
-          <LogIn className="w-8 h-8 text-red-600" />
+        <div className="w-16 h-16 bg-yellow-50 rounded-full flex items-center justify-center mx-auto mb-4">
+          <LogIn className="w-8 h-8 text-yellow-600" />
         </div>
         <h3 className="text-lg font-bold text-gray-900 mb-2">Sign in to Checkout</h3>
         <p className="text-sm text-gray-500 mb-6">Login to complete your order</p>
@@ -52,22 +52,22 @@ const CheckoutSidebar = ({
           <h3 className="font-bold text-gray-900 text-sm md:text-base">Delivery Address</h3>
           <button 
             onClick={onChangeAddress} 
-            className="text-xs font-bold text-red-600 hover:text-red-700 bg-red-50 px-2.5 md:px-3 py-1 md:py-1.5 rounded-full transition-colors"
+            className="text-xs font-bold text-slate-700 hover:text-slate-800 bg-yellow-50 px-2.5 md:px-3 py-1 md:py-1.5 rounded-full transition-colors"
           >
             {hasNoAddresses ? 'Add' : 'Change'}
           </button>
         </div>
         
         {hasNoAddresses ? (
-          <div className="flex flex-col items-center justify-center bg-red-50 border-2 border-dashed border-red-200 p-4 md:p-6 rounded-lg text-center">
+          <div className="flex flex-col items-center justify-center bg-yellow-50 border-2 border-dashed border-yellow-200 p-4 md:p-6 rounded-lg text-center">
             <div className="w-10 h-10 md:w-12 md:h-12 bg-white rounded-full flex items-center justify-center mb-3">
-              <AlertCircle className="w-5 h-5 md:w-6 md:h-6 text-red-600" />
+              <AlertCircle className="w-5 h-5 md:w-6 md:h-6 text-yellow-600" />
             </div>
             <p className="text-xs md:text-sm font-bold text-gray-800 mb-1">No Address Added</p>
             <p className="text-xs text-gray-500 mb-3 md:mb-4">Please add a delivery address to continue</p>
             <button 
               onClick={onChangeAddress}
-              className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg text-xs md:text-sm font-bold hover:bg-red-700 transition-colors"
+              className="flex items-center gap-2 bg-slate-700 text-white px-4 py-2 rounded-lg text-xs md:text-sm font-bold hover:bg-slate-800 transition-colors"
             >
               <Plus className="w-4 h-4" />
               Add Address
@@ -118,12 +118,12 @@ const CheckoutSidebar = ({
         <button 
           onClick={onPlaceOrder}
           disabled={loading || hasNoAddresses}
-          className="w-full bg-red-600 text-white font-bold py-3 md:py-4 rounded-xl hover:bg-red-700 transition-all shadow-lg shadow-red-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2 text-sm md:text-base"
+          className="w-full bg-slate-700 text-white font-bold py-3 md:py-4 rounded-xl hover:bg-slate-800 transition-all shadow-lg shadow-slate-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2 text-sm md:text-base"
         >
           {loading ? <Loader2 className="animate-spin w-5 h-5" /> : 'Place Order'}
         </button>
         {hasNoAddresses && (
-          <p className="text-xs text-center text-red-600 mt-2 font-medium">Add an address to place order</p>
+          <p className="text-xs text-center text-slate-700 mt-2 font-medium">Add an address to place order</p>
         )}
       </div>
     </>

@@ -148,7 +148,7 @@ const Cart = () => {
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
             <h1 className="text-xl md:text-2xl font-bold text-gray-900 flex items-center gap-2">
-              <Link to="/" className="text-gray-400 hover:text-red-600 transition-colors">
+              <Link to="/" className="text-gray-400 hover:text-slate-700 transition-colors">
                 <ArrowLeft className="w-5 h-5 md:w-6 md:h-6" />
               </Link>
               Checkout

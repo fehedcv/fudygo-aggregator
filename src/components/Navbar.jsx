@@ -10,7 +10,7 @@ import {
 import LocationModal from './LocationModal';
 import FilterDrawer from './FilterDrawer';
 
-const DEFAULT_AVATAR = 'https://ui-avatars.com/api/?background=ef4444&color=fff&bold=true&size=128&name=';
+const DEFAULT_AVATAR = 'https://ui-avatars.com/api/?background=475569&color=fff&bold=true&size=128&name=';
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -64,9 +64,12 @@ const Navbar = () => {
             
             {/* LEFT SIDE: Brand & Location */}
             <div className="flex items-center gap-4 lg:gap-12">
-              <Link to="/" className="flex flex-col items-center justify-center leading-none group cursor-pointer">
-                <h1 className="text-2xl lg:text-3xl font-black text-red-600 tracking-tighter uppercase group-hover:opacity-90 transition-opacity">FudyGo</h1>
-                <span className="text-[0.5rem] lg:text-[0.65rem] font-bold text-red-500 tracking-[0.2em] uppercase mt-0.5">Order. Eat. Enjoy.</span>
+              <Link to="/" className="flex items-center justify-center group cursor-pointer">
+                <img 
+                  src="/fudygo-logo.png" 
+                  alt="FudyGo" 
+                  className="h-16 lg:h-20 w-auto object-contain group-hover:opacity-90 transition-opacity"
+                />
               </Link>
 
               {/* Location (Desktop) */}
@@ -74,14 +77,14 @@ const Navbar = () => {
                 onClick={() => setIsLocationModalOpen(true)}
                 className="hidden md:flex items-center gap-3 group cursor-pointer select-none border-l border-gray-200 pl-8 h-10"
               >
-                <div className="p-2 bg-red-50 rounded-full group-hover:bg-red-100 transition-colors">
-                  <MapPin className="w-5 h-5 text-red-600" />
+                <div className="p-2 bg-yellow-50 rounded-full group-hover:bg-yellow-100 transition-colors">
+                  <MapPin className="w-5 h-5 text-yellow-500" />
                 </div>
                 <div className="flex items-center gap-1">
-                  <span className="font-bold text-gray-800 text-sm group-hover:text-red-600 transition-colors truncate max-w-[150px]">
+                  <span className="font-bold text-gray-800 text-sm group-hover:text-slate-700 transition-colors truncate max-w-[150px]">
                     {locationName}
                   </span>
-                  <ChevronDown className="w-4 h-4 text-gray-400 group-hover:text-red-500 transition-colors" />
+                  <ChevronDown className="w-4 h-4 text-gray-400 group-hover:text-slate-600 transition-colors" />
                 </div>
               </div>
             </div>
@@ -89,16 +92,16 @@ const Navbar = () => {
             {/* RIGHT SIDE: Desktop Navigation */}
             <div className="hidden xl:flex items-center space-x-6">
               {navLinks.map((link) => (
-                <Link key={link.name} to={link.path} className={`flex items-center gap-2 text-sm font-semibold transition-all duration-200 ${link.name === 'Home' ? 'text-red-600' : 'text-gray-500 hover:text-red-600 hover:bg-red-50 px-3 py-2 rounded-lg'}`}>
+                <Link key={link.name} to={link.path} className={`flex items-center gap-2 text-sm font-semibold transition-all duration-200 ${link.name === 'Home' ? 'text-yellow-500' : 'text-gray-500 hover:text-slate-700 hover:bg-slate-50 px-3 py-2 rounded-lg'}`}>
                   <link.icon className={`w-4 h-4 ${link.name === 'Home' ? 'stroke-[2.5px]' : 'stroke-2'}`} />
                   {link.name}
                 </Link>
               ))}
 
-              <Link to="/cart" className="flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-red-600 px-3 py-2 rounded-lg hover:bg-red-50 transition-all relative">
+              <Link to="/cart" className="flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-slate-700 px-3 py-2 rounded-lg hover:bg-slate-50 transition-all relative">
                 <ShoppingBag className="w-5 h-5" />
                 <span>Cart</span>
-                {cartCount > 0 && <span className="absolute -top-1 -right-2 flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-600 rounded-full shadow-sm ring-2 ring-white">{cartCount}</span>}
+                {cartCount > 0 && <span className="absolute -top-1 -right-2 flex items-center justify-center w-5 h-5 text-xs font-bold text-slate-800 bg-yellow-400 rounded-full shadow-sm ring-2 ring-white">{cartCount}</span>}
               </Link>
 
               {/* USER PROFILE DROPDOWN (DESKTOP) */}
@@ -108,7 +111,7 @@ const Navbar = () => {
                     onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
                     className="flex items-center gap-2 focus:outline-none"
                   >
-                    <div className="w-9 h-9 rounded-full bg-gray-100 overflow-hidden border-2 border-gray-200 hover:border-red-400 transition-colors">
+                    <div className="w-9 h-9 rounded-full bg-gray-100 overflow-hidden border-2 border-gray-200 hover:border-yellow-400 transition-colors">
                       <img 
                         src={getAvatarUrl()} 
                         alt="User" 
@@ -121,7 +124,7 @@ const Navbar = () => {
                 ) : (
                   <button 
                     onClick={loginWithGoogle}
-                    className="flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-red-600 px-3 py-2 rounded-lg hover:bg-red-50 transition-all"
+                    className="flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-slate-700 px-3 py-2 rounded-lg hover:bg-slate-50 transition-all"
                   >
                     <LogIn className="w-4 h-4" />
                     Sign In
@@ -153,7 +156,7 @@ const Navbar = () => {
                     <div className="py-2">
                       <button
                         onClick={() => { setIsProfileDropdownOpen(false); navigate('/profile'); }}
-                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 hover:text-red-600 transition-colors"
+                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-slate-700 transition-colors"
                       >
                         <MapPinned className="w-4 h-4 text-gray-400" />
                         <span className="font-medium">Saved Addresses</span>
@@ -163,7 +166,7 @@ const Navbar = () => {
 
                       <button
                         onClick={handleLogout}
-                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
+                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-yellow-50 hover:text-slate-700 transition-colors"
                       >
                         <LogOut className="w-4 h-4 text-gray-400" />
                         <span className="font-medium">Sign Out</span>
@@ -176,15 +179,15 @@ const Navbar = () => {
 
             {/* MOBILE ICONS SECTION */}
             <div className="flex items-center xl:hidden gap-2">
-               <button onClick={() => setIsLocationModalOpen(true)} className="p-2 text-gray-600 hover:text-red-600 transition-colors md:hidden">
+               <button onClick={() => setIsLocationModalOpen(true)} className="p-2 text-gray-600 hover:text-slate-700 transition-colors md:hidden">
                 <MapPin className="w-6 h-6" />
               </button>
               
-              <button onClick={() => setIsFilterOpen(true)} className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors">
+              <button onClick={() => setIsFilterOpen(true)} className="p-2 text-gray-600 hover:text-slate-700 hover:bg-slate-50 rounded-full transition-colors">
                 <SlidersHorizontal className="w-6 h-6" />
               </button>
 
-              <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-2 rounded-md text-gray-600 hover:text-red-600 hover:bg-gray-100 transition-colors">
+              <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-2 rounded-md text-gray-600 hover:text-slate-700 hover:bg-gray-100 transition-colors">
                 {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>
             </div>
@@ -196,9 +199,9 @@ const Navbar = () => {
           <div className="xl:hidden border-t border-gray-100 bg-white shadow-lg absolute w-full left-0">
             <div className="px-4 pt-2 pb-6 space-y-1">
               <div onClick={() => { setIsMobileMenuOpen(false); setIsLocationModalOpen(true); }} className="flex items-center gap-3 px-3 py-4 border-b border-gray-100 mb-2 cursor-pointer active:bg-gray-50">
-                <MapPin className="w-5 h-5 text-red-600" />
+                <MapPin className="w-5 h-5 text-yellow-500" />
                 <span className="font-bold text-gray-800">{locationName}</span>
-                <span className="text-xs text-blue-500 ml-auto font-medium">Change</span>
+                <span className="text-xs text-slate-600 ml-auto font-medium">Change</span>
               </div>
               
               {/* Map through navLinks for Mobile Menu as well */}
@@ -207,23 +210,23 @@ const Navbar = () => {
                   key={link.name}
                   to={link.path} 
                   onClick={() => setIsMobileMenuOpen(false)} 
-                  className="flex items-center gap-3 px-3 py-3 rounded-md text-base font-medium text-gray-600 hover:text-red-600 hover:bg-gray-50"
+                  className="flex items-center gap-3 px-3 py-3 rounded-md text-base font-medium text-gray-600 hover:text-slate-700 hover:bg-slate-50"
                 >
                     <link.icon className="w-5 h-5" /> {link.name}
                 </Link>
               ))}
 
-              <Link to="/profile" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 px-3 py-3 rounded-md text-base font-medium text-gray-600 hover:text-red-600 hover:bg-gray-50">
+              <Link to="/profile" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 px-3 py-3 rounded-md text-base font-medium text-gray-600 hover:text-slate-700 hover:bg-slate-50">
                   <MapPinned className="w-5 h-5" /> Saved Addresses
               </Link>
-              <Link to="/cart" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 px-3 py-3 rounded-md text-base font-medium text-gray-600 hover:text-red-600 hover:bg-gray-50">
+              <Link to="/cart" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 px-3 py-3 rounded-md text-base font-medium text-gray-600 hover:text-slate-700 hover:bg-slate-50">
                   <ShoppingBag className="w-5 h-5" /> Cart ({cartCount})
               </Link>
 
               {currentUser && (
                 <button 
                   onClick={() => { setIsMobileMenuOpen(false); handleLogout(); }} 
-                  className="w-full flex items-center gap-3 px-3 py-3 rounded-md text-base font-medium text-red-600 hover:bg-red-50"
+                  className="w-full flex items-center gap-3 px-3 py-3 rounded-md text-base font-medium text-slate-700 hover:bg-yellow-50"
                 >
                   <LogOut className="w-5 h-5" /> Sign Out
                 </button>
@@ -239,27 +242,27 @@ const Navbar = () => {
       {/* BOTTOM NAVBAR FOR MOBILE */}
       <div className="xl:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
         <div className="flex items-center justify-around h-16 px-2">
-          <Link to="/" className="flex flex-col items-center justify-center flex-1 py-2 text-gray-600 hover:text-red-600 transition-colors">
+          <Link to="/" className="flex flex-col items-center justify-center flex-1 py-2 text-gray-600 hover:text-slate-700 transition-colors">
             <Home className="w-6 h-6 mb-1" />
             <span className="text-xs font-medium">Home</span>
           </Link>
           
-          <Link to="/orders" className="flex flex-col items-center justify-center flex-1 py-2 text-gray-600 hover:text-red-600 transition-colors">
+          <Link to="/orders" className="flex flex-col items-center justify-center flex-1 py-2 text-gray-600 hover:text-slate-700 transition-colors">
             <Receipt className="w-6 h-6 mb-1" />
             <span className="text-xs font-medium">Orders</span>
           </Link>
           
-          <Link to="/cart" className="flex flex-col items-center justify-center flex-1 py-2 text-gray-600 hover:text-red-600 transition-colors relative">
+          <Link to="/cart" className="flex flex-col items-center justify-center flex-1 py-2 text-gray-600 hover:text-slate-700 transition-colors relative">
             <ShoppingBag className="w-6 h-6 mb-1" />
             {cartCount > 0 && (
-              <span className="absolute top-1 right-1/2 translate-x-3 -translate-y-1 flex items-center justify-center w-5 h-5 text-[10px] font-bold text-white bg-red-600 rounded-full border-2 border-white">
+              <span className="absolute top-1 right-1/2 translate-x-3 -translate-y-1 flex items-center justify-center w-5 h-5 text-[10px] font-bold text-slate-800 bg-yellow-400 rounded-full border-2 border-white">
                 {cartCount}
               </span>
             )}
             <span className="text-xs font-medium">Cart</span>
           </Link>
           
-          <Link to="/profile" className="flex flex-col items-center justify-center flex-1 py-2 text-gray-600 hover:text-red-600 transition-colors">
+          <Link to="/profile" className="flex flex-col items-center justify-center flex-1 py-2 text-gray-600 hover:text-slate-700 transition-colors">
             {currentUser ? (
               <>
                 <img 

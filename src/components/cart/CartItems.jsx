@@ -8,7 +8,7 @@ const CartItems = ({ cart, updateQuantity, removeFromCart, instructions, setInst
         <div className="p-3 md:p-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 md:w-8 md:h-8 bg-white rounded-lg border border-gray-200 flex items-center justify-center">
-              <ShoppingBag className="w-3.5 h-3.5 md:w-4 md:h-4 text-red-600" />
+              <ShoppingBag className="w-3.5 h-3.5 md:w-4 md:h-4 text-yellow-600" />
             </div>
             <h2 className="font-bold text-gray-800 text-sm md:text-base truncate">Order from {cart.restaurantName}</h2>
           </div>
@@ -28,18 +28,18 @@ const CartItems = ({ cart, updateQuantity, removeFromCart, instructions, setInst
 
               <div className="flex items-center gap-2 md:gap-4 flex-shrink-0">
                 <div className="flex items-center gap-1.5 md:gap-2 bg-gray-50 rounded-lg p-0.5 md:p-1 border border-gray-100">
-                  <button onClick={() => updateQuantity(item.name, -1)} className="w-6 h-6 md:w-7 md:h-7 flex items-center justify-center bg-white rounded shadow-sm text-gray-600 hover:text-red-600 disabled:opacity-50 transition-colors">
+                  <button onClick={() => updateQuantity(item.name, -1)} className="w-6 h-6 md:w-7 md:h-7 flex items-center justify-center bg-white rounded shadow-sm text-gray-600 hover:text-slate-700 disabled:opacity-50 transition-colors">
                     <Minus className="w-2.5 h-2.5 md:w-3 md:h-3" strokeWidth={2.5} />
                   </button>
                   <span className="text-xs md:text-sm font-bold w-4 md:w-5 text-center text-gray-800">{item.quantity}</span>
-                  <button onClick={() => updateQuantity(item.name, 1)} className="w-6 h-6 md:w-7 md:h-7 flex items-center justify-center bg-white rounded shadow-sm text-gray-600 hover:text-red-600 transition-colors">
+                  <button onClick={() => updateQuantity(item.name, 1)} className="w-6 h-6 md:w-7 md:h-7 flex items-center justify-center bg-white rounded shadow-sm text-gray-600 hover:text-slate-700 transition-colors">
                     <Plus className="w-2.5 h-2.5 md:w-3 md:h-3" strokeWidth={2.5} />
                   </button>
                 </div>
                 <span className="font-bold text-gray-800 w-12 md:w-16 text-right tabular-nums text-xs md:text-sm">
                   ₹{(parseFloat(item.price) * item.quantity).toFixed(0)}
                 </span>
-                <button onClick={() => removeFromCart(item.name)} className="text-gray-300 hover:text-red-500 p-1.5 md:p-2 transition-colors">
+                <button onClick={() => removeFromCart(item.name)} className="text-gray-300 hover:text-slate-700 p-1.5 md:p-2 transition-colors">
                   <Trash2 className="w-3.5 h-3.5 md:w-4 md:h-4" />
                 </button>
               </div>
@@ -55,7 +55,7 @@ const CartItems = ({ cart, updateQuantity, removeFromCart, instructions, setInst
           value={instructions}
           onChange={(e) => setInstructions(e.target.value)}
           placeholder="e.g. Leave at front door, ring doorbell..." 
-          className="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 md:p-3 text-xs md:text-sm focus:ring-2 focus:ring-red-100 focus:border-red-200 outline-none transition-all resize-none h-16 md:h-20"
+          className="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 md:p-3 text-xs md:text-sm focus:ring-2 focus:ring-yellow-100 focus:border-yellow-200 outline-none transition-all resize-none h-16 md:h-20"
         ></textarea>
       </div>
     </div>

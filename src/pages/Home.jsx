@@ -50,7 +50,7 @@ const Home = () => {
             <input 
               type="text" 
               placeholder="Search by restaurant name..." 
-              className="w-full pl-11 pr-4 py-4 bg-gray-50 border-none rounded-xl text-sm font-medium focus:ring-2 focus:ring-red-100 focus:bg-white transition-all outline-none placeholder-gray-400 shadow-sm"
+              className="w-full pl-11 pr-4 py-4 bg-gray-50 border-none rounded-xl text-sm font-medium focus:ring-2 focus:ring-yellow-100 focus:bg-white transition-all outline-none placeholder-gray-400 shadow-sm"
               value={filters.name}
               onChange={handleSearchChange}
             />
@@ -64,15 +64,15 @@ const Home = () => {
               <p className="text-gray-500">Please select your location to see restaurants.</p>
             </div>
           ) : error ? (
-            <div className="text-center py-20 bg-red-50 rounded-xl border border-red-100">
-              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Store className="w-6 h-6 text-red-500" />
+            <div className="text-center py-20 bg-yellow-50 rounded-xl border border-yellow-100">
+              <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Store className="w-6 h-6 text-yellow-600" />
               </div>
               <h3 className="text-lg font-bold text-gray-700 mb-2">Oops!</h3>
-              <p className="text-red-600 font-medium mb-4">{error}</p>
+              <p className="text-slate-700 font-medium mb-4">{error}</p>
               <button
                 onClick={() => window.location.reload()}
-                className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+                className="px-6 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition-colors font-medium"
               >
                 Retry
               </button>

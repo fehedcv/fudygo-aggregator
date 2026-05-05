@@ -43,15 +43,15 @@ const Orders = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 max-w-sm w-full text-center">
-          <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Receipt className="w-8 h-8 text-red-600" />
+          <div className="w-16 h-16 bg-yellow-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Receipt className="w-8 h-8 text-yellow-600" />
           </div>
           <h2 className="text-xl font-bold text-gray-900 mb-2">View Your Orders</h2>
           <p className="text-sm text-gray-500 mb-6">Sign in to see your orders</p>
           
           <button
             onClick={loginWithGoogle}
-            className="w-full bg-red-600 text-white font-semibold py-3 rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center gap-2 mb-3"
+            className="w-full bg-slate-700 text-white font-semibold py-3 rounded-lg hover:bg-slate-800 transition-colors flex items-center justify-center gap-2 mb-3"
           >
             <LogIn className="w-4 h-4" />
             Sign in with Google
@@ -94,7 +94,7 @@ const Orders = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <Loader2 className="w-8 h-8 text-red-600 animate-spin" />
+        <Loader2 className="w-8 h-8 text-slate-700 animate-spin" />
       </div>
     );
   }
@@ -105,7 +105,7 @@ const Orders = () => {
         
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
-          <Link to="/" className="p-2 bg-white rounded-full border border-gray-200 text-gray-500 hover:text-red-600 transition-colors shadow-sm">
+          <Link to="/" className="p-2 bg-white rounded-full border border-gray-200 text-gray-500 hover:text-slate-700 transition-colors shadow-sm">
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <h1 className="text-2xl font-bold text-gray-900">Your Orders</h1>
@@ -119,7 +119,7 @@ const Orders = () => {
             </div>
             <h3 className="text-lg font-bold text-gray-900 mb-2">No orders yet</h3>
             <p className="text-gray-500 mb-6">Looks like you haven't placed any orders yet.</p>
-            <Link to="/" className="inline-flex items-center gap-2 bg-red-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-red-700 transition-colors">
+            <Link to="/" className="inline-flex items-center gap-2 bg-slate-700 text-white px-6 py-3 rounded-xl font-bold hover:bg-slate-800 transition-colors">
               Start Exploring <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
@@ -198,7 +198,7 @@ const Orders = () => {
                       <button className="text-xs font-bold text-gray-500 hover:text-gray-900">
                           View Details
                       </button>
-                      <button className="text-sm font-bold text-red-600 hover:bg-red-50 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5">
+                      <button className="text-sm font-bold text-slate-700 hover:bg-yellow-50 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5">
                           <RotateCcw className="w-3 h-3" /> Reorder
                       </button>
                   </div>
