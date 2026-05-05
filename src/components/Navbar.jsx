@@ -1,26 +1,54 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useLocation } from '../context/LocationContext';
 import { useAuth } from '../context/AuthContext';
 import { 
   Home, ShoppingBag, RotateCcw, Menu, X, MapPin, 
-  ChevronDown, MoreHorizontal, SlidersHorizontal, User, Receipt // Import Receipt Icon
+  ChevronDown, MoreHorizontal, SlidersHorizontal, User, Receipt, LogOut, LogIn, MapPinned
 } from 'lucide-react';
 import LocationModal from './LocationModal';
 import FilterDrawer from './FilterDrawer';
+
+const DEFAULT_AVATAR = 'https://ui-avatars.com/api/?background=ef4444&color=fff&bold=true&size=128&name=';
 
 const Navbar = () => {
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  
+  const dropdownRef = useRef(null);
   
   const { locationName, updateLocation } = useLocation();
   const { getCartCount } = useCart();
-  const { currentUser } = useAuth();
+  const { currentUser, loginWithGoogle, logout } = useAuth();
   
   const cartCount = getCartCount();
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsProfileDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const getAvatarUrl = () => {
+    if (currentUser?.photoURL) return currentUser.photoURL;
+    const name = currentUser?.displayName || currentUser?.email || 'U';
+    return `${DEFAULT_AVATAR}${encodeURIComponent(name)}`;
+  };
+
+  const handleLogout = async () => {
+    setIsProfileDropdownOpen(false);
+    await logout();
+    navigate('/');
+  };
 
   // Add 'Orders' to the navigation links array
   const navLinks = [
@@ -73,24 +101,77 @@ const Navbar = () => {
                 {cartCount > 0 && <span className="absolute -top-1 -right-2 flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-600 rounded-full shadow-sm ring-2 ring-white">{cartCount}</span>}
               </Link>
 
-              {/* USER PROFILE BUTTON (DESKTOP) */}
-              {currentUser ? (
-                <Link to="/profile" className="flex items-center gap-2 pl-4 border-l border-gray-200">
-                    <div className="w-9 h-9 rounded-full bg-gray-100 overflow-hidden border border-gray-200 hover:border-red-400 transition-colors">
-                        {currentUser.photoURL ? (
-                            <img src={currentUser.photoURL} alt="User" className="w-full h-full object-cover" />
-                        ) : (
-                            <div className="w-full h-full flex items-center justify-center text-gray-400"><User className="w-5 h-5" /></div>
-                        )}
+              {/* USER PROFILE DROPDOWN (DESKTOP) */}
+              <div className="relative pl-4 border-l border-gray-200" ref={dropdownRef}>
+                {currentUser ? (
+                  <button 
+                    onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+                    className="flex items-center gap-2 focus:outline-none"
+                  >
+                    <div className="w-9 h-9 rounded-full bg-gray-100 overflow-hidden border-2 border-gray-200 hover:border-red-400 transition-colors">
+                      <img 
+                        src={getAvatarUrl()} 
+                        alt="User" 
+                        className="w-full h-full object-cover" 
+                        onError={(e) => { e.target.src = `${DEFAULT_AVATAR}U`; }}
+                      />
                     </div>
-                </Link>
-              ) : (
-                <Link to="/profile" className="flex items-center gap-2 pl-4 border-l border-gray-200">
-                    <div className="w-9 h-9 rounded-full bg-gray-100 overflow-hidden border border-gray-200 hover:border-red-400 transition-colors flex items-center justify-center">
-                        <User className="w-5 h-5 text-gray-400" />
+                    <ChevronDown className={`w-3.5 h-3.5 text-gray-400 transition-transform duration-200 ${isProfileDropdownOpen ? 'rotate-180' : ''}`} />
+                  </button>
+                ) : (
+                  <button 
+                    onClick={loginWithGoogle}
+                    className="flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-red-600 px-3 py-2 rounded-lg hover:bg-red-50 transition-all"
+                  >
+                    <LogIn className="w-4 h-4" />
+                    Sign In
+                  </button>
+                )}
+
+                {/* Dropdown Menu */}
+                {isProfileDropdownOpen && currentUser && (
+                  <div className="absolute right-0 mt-3 w-72 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                    {/* User Info */}
+                    <div className="px-4 py-4 bg-gray-50/80 border-b border-gray-100">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-sm shrink-0">
+                          <img 
+                            src={getAvatarUrl()} 
+                            alt="User" 
+                            className="w-full h-full object-cover"
+                            onError={(e) => { e.target.src = `${DEFAULT_AVATAR}U`; }}
+                          />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="font-bold text-sm text-gray-900 truncate">{currentUser.displayName || 'User'}</p>
+                          <p className="text-xs text-gray-500 truncate">{currentUser.email}</p>
+                        </div>
+                      </div>
                     </div>
-                </Link>
-              )}
+
+                    {/* Menu Items */}
+                    <div className="py-2">
+                      <button
+                        onClick={() => { setIsProfileDropdownOpen(false); navigate('/profile'); }}
+                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 hover:text-red-600 transition-colors"
+                      >
+                        <MapPinned className="w-4 h-4 text-gray-400" />
+                        <span className="font-medium">Saved Addresses</span>
+                      </button>
+
+                      <div className="mx-3 border-t border-gray-100"></div>
+
+                      <button
+                        onClick={handleLogout}
+                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
+                      >
+                        <LogOut className="w-4 h-4 text-gray-400" />
+                        <span className="font-medium">Sign Out</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* MOBILE ICONS SECTION */}
@@ -133,11 +214,20 @@ const Navbar = () => {
               ))}
 
               <Link to="/profile" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 px-3 py-3 rounded-md text-base font-medium text-gray-600 hover:text-red-600 hover:bg-gray-50">
-                  <User className="w-5 h-5" /> My Profile
+                  <MapPinned className="w-5 h-5" /> Saved Addresses
               </Link>
               <Link to="/cart" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 px-3 py-3 rounded-md text-base font-medium text-gray-600 hover:text-red-600 hover:bg-gray-50">
                   <ShoppingBag className="w-5 h-5" /> Cart ({cartCount})
               </Link>
+
+              {currentUser && (
+                <button 
+                  onClick={() => { setIsMobileMenuOpen(false); handleLogout(); }} 
+                  className="w-full flex items-center gap-3 px-3 py-3 rounded-md text-base font-medium text-red-600 hover:bg-red-50"
+                >
+                  <LogOut className="w-5 h-5" /> Sign Out
+                </button>
+              )}
             </div>
           </div>
         )}
@@ -169,10 +259,15 @@ const Navbar = () => {
             <span className="text-xs font-medium">Cart</span>
           </Link>
           
-          <Link to={currentUser ? "/profile" : "/cart"} className="flex flex-col items-center justify-center flex-1 py-2 text-gray-600 hover:text-red-600 transition-colors">
-            {currentUser && currentUser.photoURL ? (
+          <Link to="/profile" className="flex flex-col items-center justify-center flex-1 py-2 text-gray-600 hover:text-red-600 transition-colors">
+            {currentUser ? (
               <>
-                <img src={currentUser.photoURL} className="w-6 h-6 rounded-full border border-gray-200 mb-1" alt="User" />
+                <img 
+                  src={getAvatarUrl()} 
+                  className="w-6 h-6 rounded-full border border-gray-200 mb-1" 
+                  alt="User"
+                  onError={(e) => { e.target.src = `${DEFAULT_AVATAR}U`; }} 
+                />
                 <span className="text-xs font-medium">Profile</span>
               </>
             ) : (

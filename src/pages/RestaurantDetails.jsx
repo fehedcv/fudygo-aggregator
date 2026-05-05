@@ -3,12 +3,14 @@ import { useParams } from 'react-router-dom';
 import { useRestaurants } from '../context/RestaurantContext';
 import { useCart } from '../context/CartContext';
 import axiosClient from '../api/axiosClient';
-import { Star, Clock, MapPin, Info, ChevronDown, Bike, ShoppingBag, Loader2, Plus, Minus } from 'lucide-react';
+import { Star, Clock, MapPin, Info, ChevronDown, Bike, ShoppingBag, Loader2, Plus, Minus, UtensilsCrossed, PackageOpen } from 'lucide-react';
 import BottomCartBar from '../components/BottomCartBar';
 import toast, { Toaster } from 'react-hot-toast';
 import RestaurantDetailsSkeleton from '../components/SkeletonLoader';
-import { LazyLoadImage } from 'react-lazy-load-image-component';
-import 'react-lazy-load-image-component/src/effects/blur.css';
+
+
+const DEFAULT_HERO_IMAGE = 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&auto=format&fit=crop&q=60';
+const DEFAULT_LOGO = 'https://cdn-icons-png.flaticon.com/512/3448/3448609.png';
 
 const RestaurantDetails = () => {
   const { id } = useParams();
@@ -19,6 +21,8 @@ const RestaurantDetails = () => {
   const [menuItems, setMenuItems] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [heroImgError, setHeroImgError] = useState(false);
+  const [logoImgError, setLogoImgError] = useState(false);
 
   // Helper to get item quantity from cart
   const getItemQuantity = (itemName) => {
@@ -37,9 +41,13 @@ const RestaurantDetails = () => {
     deliveryFee: "₹40",
     minOrder: "₹100",
     discount: null,
-    image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=1200&auto=format&fit=crop&q=60",
-    logo: "https://cdn-icons-png.flaticon.com/512/732/732217.png"
+    image: DEFAULT_HERO_IMAGE,
+    logo: DEFAULT_LOGO
   };
+
+  // Get safe image URLs with fallbacks
+  const heroImage = (!restaurantInfo.image || heroImgError) ? DEFAULT_HERO_IMAGE : restaurantInfo.image;
+  const logoImage = (!restaurantInfo.logo || logoImgError) ? DEFAULT_LOGO : restaurantInfo.logo;
 
   // 2. Fetch Menu Data
   useEffect(() => {
@@ -59,7 +67,6 @@ const RestaurantDetails = () => {
       }
     };
     fetchMenuData();
-    window.scrollTo(0, 0);
   }, [id]);
 
   // 3. Process Menu Data
@@ -73,7 +80,7 @@ const RestaurantDetails = () => {
 
   const availableCategories = Object.keys(menuGrouped);
 
-  // 4. Cart Handler
+  // 4. Cart Handler - Only show toast for first add, not for quantity increase via + button
   const handleAddToCart = (item) => {
     const cartItem = {
       name: item.name,
@@ -82,7 +89,11 @@ const RestaurantDetails = () => {
       image: item.image_url
     };
     addToCart(cartItem, id, restaurantInfo.name);
+
+    // Dismiss any existing toasts before showing a new one
+    toast.dismiss();
     toast.success(`${item.name} added to cart!`, {
+      id: `cart-${item.id}`, // Unique ID prevents duplicate toasts for same item
       icon: '🛒',
       style: {
         borderRadius: '12px',
@@ -92,7 +103,7 @@ const RestaurantDetails = () => {
         fontSize: '14px',
         fontWeight: '500',
       },
-      duration: 2000,
+      duration: 1500,
     });
   };
 
@@ -100,22 +111,40 @@ const RestaurantDetails = () => {
       return <RestaurantDetailsSkeleton />;
   }
 
-  // ... (Rest of the UI remains the same as previous step) ...
+  // Check if menu is empty
+  const hasNoMenu = menuItems.length === 0 && categories.length === 0;
+  const hasNoCategories = categories.length === 0 && menuItems.length > 0;
+
   return (
     <>
-      <Toaster position="bottom-center" />
+      <Toaster 
+        position="top-center" 
+        toastOptions={{ style: { marginTop: '60px' } }} 
+        containerStyle={{ top: 20 }}
+      />
       <BottomCartBar />
       <div className="bg-gray-50 min-h-screen pb-20">
       {/* Hero Section */}
       <div className="relative">
-        <div className="h-64 md:h-80 w-full overflow-hidden">
-          <LazyLoadImage
-            src={restaurantInfo.image}
-            alt={restaurantInfo.name}
-            effect="blur"
-            wrapperClassName="w-full h-full"
-            className="w-full h-full object-cover brightness-75"
-          />
+        <div className="h-64 md:h-80 w-full overflow-hidden bg-gray-200">
+          {heroImgError || !restaurantInfo.image ? (
+            <div className="w-full h-full bg-gradient-to-br from-red-100 via-orange-50 to-amber-100 flex items-center justify-center">
+              <div className="text-center">
+                <div className="w-20 h-20 bg-white/60 rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm">
+                  <UtensilsCrossed className="w-10 h-10 text-red-300" />
+                </div>
+                <p className="text-sm font-semibold text-red-300 uppercase tracking-wider">{restaurantInfo.name}</p>
+              </div>
+            </div>
+          ) : (
+            <img
+              src={restaurantInfo.image}
+              alt={restaurantInfo.name}
+              loading="lazy"
+              className="w-full h-full object-cover brightness-75"
+              onError={() => setHeroImgError(true)}
+            />
+          )}
         </div>
         
         {/* ... Info Card Logic ... */}
@@ -123,12 +152,19 @@ const RestaurantDetails = () => {
           <div className="bg-white rounded-xl shadow-xl p-6 md:p-8 relative">
             {/* Logo */}
             <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-white p-2 rounded-xl shadow-md">
-              <LazyLoadImage
-                src={restaurantInfo.logo}
-                alt="Logo"
-                effect="blur"
-                className="w-16 h-16 object-contain"
-              />
+              {logoImgError || !restaurantInfo.logo ? (
+                <div className="w-16 h-16 bg-red-50 rounded-lg flex items-center justify-center">
+                  <UtensilsCrossed className="w-8 h-8 text-red-400" />
+                </div>
+              ) : (
+                <img
+                  src={restaurantInfo.logo}
+                  alt="Logo"
+                  loading="lazy"
+                  className="w-16 h-16 object-contain"
+                  onError={() => setLogoImgError(true)}
+                />
+              )}
             </div>
             
             {/* Name & Address from Context */}
@@ -146,6 +182,18 @@ const RestaurantDetails = () => {
 
       {/* Main Content (Menu) */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+        {hasNoMenu ? (
+          /* Empty Menu State */
+          <div className="max-w-lg mx-auto text-center py-16">
+            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <PackageOpen className="w-12 h-12 text-gray-300" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-800 mb-2">No Menu Available Yet</h3>
+            <p className="text-sm text-gray-500 max-w-sm mx-auto leading-relaxed">
+              This restaurant hasn't added any items to their menu yet. Please check back later!
+            </p>
+          </div>
+        ) : (
         <div className="flex flex-col lg:flex-row gap-8">
            {/* ... Categories Sidebar ... */}
            <div className="hidden lg:block w-64 flex-shrink-0">
@@ -153,6 +201,11 @@ const RestaurantDetails = () => {
                 <div className="p-4 border-b border-red-100 bg-red-50">
                    <h3 className="font-bold text-red-600">Categories</h3>
                 </div>
+                {availableCategories.length === 0 ? (
+                  <div className="p-6 text-center text-gray-400">
+                    <p className="text-sm">No categories found</p>
+                  </div>
+                ) : (
                 <ul className="max-h-[70vh] overflow-y-auto custom-scrollbar">
                    {availableCategories.map((cat, idx) => (
                       <li key={idx}>
@@ -162,12 +215,22 @@ const RestaurantDetails = () => {
                       </li>
                    ))}
                 </ul>
+                )}
              </div>
           </div>
 
            {/* ... Menu List ... */}
            <div className="flex-1 space-y-8">
-                {availableCategories.map((category) => (
+                {availableCategories.length === 0 ? (
+                  <div className="text-center py-12 bg-white rounded-xl border border-gray-100">
+                    <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <UtensilsCrossed className="w-8 h-8 text-gray-300" />
+                    </div>
+                    <h3 className="text-base font-bold text-gray-700 mb-1">No items in this menu</h3>
+                    <p className="text-sm text-gray-400">Menu items will appear here once added.</p>
+                  </div>
+                ) : (
+                availableCategories.map((category) => (
                   <div key={category} id={category} className="scroll-mt-24">
                      <div className="bg-gray-50 border-l-4 border-red-600 px-4 py-2.5 mb-4 rounded-r-lg">
                        <h2 className="text-base font-bold text-gray-900 uppercase tracking-wide">{category}</h2>
@@ -219,9 +282,11 @@ const RestaurantDetails = () => {
                         })}
                      </div>
                   </div>
-                ))}
+                ))
+                )}
            </div>
         </div>
+        )}
       </div>
     </div>
     </>

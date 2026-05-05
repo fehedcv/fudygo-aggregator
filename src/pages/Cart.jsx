@@ -16,7 +16,7 @@ import CartSkeleton from '../components/cart/CartSkeleton';
 
 const Cart = () => {
   const { cart, updateQuantity, removeFromCart, clearCart, getCartTotal, deliveryAddress, setDeliveryAddress } = useCart();
-  const { currentUser, loginWithGoogle, logout } = useAuth();
+  const { currentUser, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
   
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
@@ -153,12 +153,6 @@ const Cart = () => {
               </Link>
               Checkout
             </h1>
-            {currentUser && (
-                <div className="flex items-center gap-2 md:gap-3">
-                    <img src={currentUser.photoURL} alt="User" className="w-7 h-7 md:w-8 md:h-8 rounded-full border border-gray-200" />
-                    <button onClick={logout} className="text-xs md:text-sm font-medium text-gray-500 hover:text-red-600 hidden sm:block">Sign Out</button>
-                </div>
-            )}
         </div>
 
         <div className="flex flex-col lg:flex-row gap-4 md:gap-6">
@@ -191,6 +185,21 @@ const Cart = () => {
         loading={loadingAddresses}
         selectedId={deliveryAddress?.id}
         onSelect={handleAddressSelect}
+        onAddressAdded={async () => {
+          try {
+            const response = await axiosClient.get('/addresses/me');
+            if (Array.isArray(response)) {
+              setSavedAddresses(response);
+              // Auto-select the newest address
+              if (response.length > 0) {
+                const newest = response[response.length - 1];
+                handleAddressSelect(newest);
+              }
+            }
+          } catch (error) {
+            console.error("Failed to refresh addresses:", error);
+          }
+        }}
       />
       </div>
     </>

@@ -1,37 +1,43 @@
 // src/components/RestaurantCard.jsx
 import { Link } from 'react-router-dom';
-import { Star, MapPin } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { useInView } from 'react-intersection-observer';
-import { LazyLoadImage } from 'react-lazy-load-image-component';
-import 'react-lazy-load-image-component/src/effects/blur.css';
+import { Star, MapPin, UtensilsCrossed } from 'lucide-react';
+import { useState, memo } from 'react';
 
-const RestaurantCard = ({ data, index = 0 }) => {
-  const { ref, inView } = useInView({
-    triggerOnce: true,
-    threshold: 0.1,
-  });
+const RestaurantCard = memo(({ data, index }) => {
+  const [imgError, setImgError] = useState(false);
+  const [imgLoaded, setImgLoaded] = useState(false);
+  const showPlaceholder = imgError || !data.image;
 
   return (
-    <div ref={ref}>
+    <div style={{ animationDelay: `${index * 30}ms` }} className="opacity-0 animate-fade-in-up restaurant-card">
       <Link to={`/restaurant/${data.id}`} className="block h-full">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: 0.4, delay: index * 0.05 }}
-          whileHover={{ y: -8, boxShadow: "0 20px 40px rgba(0,0,0,0.1)" }}
-          className="bg-white rounded-xl overflow-hidden border border-gray-100 h-full flex flex-col group"
-        >
+        <div className="bg-white rounded-xl overflow-hidden border border-gray-100 h-full flex flex-col group hover:-translate-y-1 hover:shadow-xl transition-[transform,box-shadow] duration-200 will-change-transform">
         
         {/* --- Image Section --- */}
-        <div className="relative h-32 lg:h-36 overflow-hidden">
-          <LazyLoadImage
-            src={data.image} 
-            alt={data.name}
-            effect="blur"
-            wrapperClassName="w-full h-full"
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-          />
+        <div className="relative h-32 lg:h-36 overflow-hidden bg-gray-100">
+          {showPlaceholder ? (
+            <div className="w-full h-full bg-gradient-to-br from-red-50 to-orange-50 flex flex-col items-center justify-center">
+              <div className="w-14 h-14 bg-white/80 rounded-full flex items-center justify-center mb-1.5 shadow-sm">
+                <UtensilsCrossed className="w-7 h-7 text-red-400" />
+              </div>
+              <span className="text-[10px] font-semibold text-red-300 uppercase tracking-wider">Restaurant</span>
+            </div>
+          ) : (
+            <>
+              {!imgLoaded && (
+                <div className="absolute inset-0 bg-gray-200 animate-pulse" />
+              )}
+              <img
+                src={data.image} 
+                alt={data.name}
+                loading={index < 6 ? "eager" : "lazy"}
+                decoding="async"
+                className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
+                onLoad={() => setImgLoaded(true)}
+                onError={() => setImgError(true)}
+              />
+            </>
+          )}
           
           {/* Discount Badge (Bottom Left) */}
           {data.discount && (
@@ -63,10 +69,12 @@ const RestaurantCard = ({ data, index = 0 }) => {
           </div>
 
         </div>
-      </motion.div>
+      </div>
       </Link>
     </div>
   );
-};
+});
+
+RestaurantCard.displayName = 'RestaurantCard';
 
 export default RestaurantCard;

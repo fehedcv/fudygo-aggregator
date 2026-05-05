@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, useMemo, useEffect } from 'react';
+import { createContext, useContext, useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import axiosClient from '../api/axiosClient';
 import { useLocation } from './LocationContext';
 
@@ -18,9 +18,23 @@ export const RestaurantProvider = ({ children }) => {
   });
   
   const { coordinates } = useLocation();
+  const abortControllerRef = useRef(null);
+  const isInitialMount = useRef(true);
 
   const fetchRestaurants = useCallback(async () => {
-    if (!coordinates) return;
+    if (!coordinates) {
+      // Clear error when coordinates are not available
+      setError(null);
+      setLoading(false);
+      return;
+    }
+
+    // Cancel previous request if still pending
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
+    abortControllerRef.current = new AbortController();
 
     setLoading(true);
     setError(null);
@@ -32,7 +46,17 @@ export const RestaurantProvider = ({ children }) => {
         ...filters,
       };
 
-      const response = await axiosClient.get(`/restaurants/`, { params });
+      const response = await axiosClient.get(`/restaurants/`, { 
+        params,
+        signal: abortControllerRef.current.signal 
+      });
+      
+      // Handle empty or invalid response
+      if (!response || !Array.isArray(response)) {
+        setRestaurants([]);
+        setError(null);
+        return;
+      }
       
       const formattedData = response.map(item => ({
         id: item.id,
@@ -51,9 +75,30 @@ export const RestaurantProvider = ({ children }) => {
       }));
 
       setRestaurants(formattedData);
+      setError(null); // Clear any previous errors on success
     } catch (err) {
+      if (err.name === 'AbortError' || err.name === 'CanceledError') {
+        return; // Request was cancelled, ignore
+      }
       console.error("Error fetching restaurants:", err);
-      setError("Failed to load restaurants.");
+      
+      // More specific error messages
+      if (err.response) {
+        // Server responded with error
+        const status = err.response.status;
+        if (status === 404) {
+          setError("No restaurants found in your area.");
+        } else if (status >= 500) {
+          setError("Server error. Please try again later.");
+        } else {
+          setError("Failed to load restaurants. Please try again.");
+        }
+      } else if (err.request) {
+        // Request made but no response
+        setError("Network error. Please check your connection.");
+      } else {
+        setError("Failed to load restaurants.");
+      }
       setRestaurants([]);
     } finally {
       setLoading(false);
@@ -61,8 +106,22 @@ export const RestaurantProvider = ({ children }) => {
   }, [coordinates, filters]);
 
   useEffect(() => {
+    // Skip fetch on initial mount if no coordinates
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      if (!coordinates) {
+        return;
+      }
+    }
+
     fetchRestaurants();
-  }, [fetchRestaurants]);
+    
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, [fetchRestaurants, coordinates]);
 
   const updateFilters = (newFilters) => {
     setFilters(prev => ({ ...prev, ...newFilters }));
