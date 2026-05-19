@@ -25,6 +25,7 @@ const Cart = () => {
   const [instructions, setInstructions] = useState('');
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [orderType, setOrderType] = useState('delivery');
   const { width, height } = useWindowSize();
 
   // ... (Keep existing useEffect for fetching addresses) ...
@@ -95,7 +96,7 @@ const Cart = () => {
     const orderPayload = {
         restaurant_id: cart.restaurantId,
         delivery_address_id: deliveryAddress.id,
-        order_type: "delivery",
+        order_type: orderType,
         items: cart.items.map(item => ({
             item_id: item.id,
             quantity: item.quantity
@@ -153,6 +154,21 @@ const Cart = () => {
               </Link>
               Checkout
             </h1>
+            <div className="flex items-center bg-gray-100 rounded-full p-1 gap-1">
+              {['delivery', 'pickup'].map((type) => (
+                <button
+                  key={type}
+                  onClick={() => setOrderType(type)}
+                  className={`px-5 py-1.5 rounded-full text-sm font-semibold capitalize transition-all duration-200 ${
+                    orderType === type
+                      ? 'bg-slate-800 text-white shadow-sm'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  {type}
+                </button>
+              ))}
+            </div>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-4 md:gap-6">
