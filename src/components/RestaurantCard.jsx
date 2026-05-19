@@ -62,11 +62,11 @@ const RestaurantCard = memo(({ data, index }) => {
             </div>
           </div>
 
-          {/* Meta Info - Address */}
-          <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-3">
-            <MapPin className="w-3.5 h-3.5 flex-shrink-0" /> 
-            <span className="truncate">{data.address}</span>
-          </div>
+            {/* Meta Info - Address */}
+            <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-3">
+              <MapPin className="w-3.5 h-3.5 flex-shrink-0" /> 
+              <span className="truncate">{data.address}</span>
+            </div>
 
           {/* Delivery Info Row */}
           <div className="flex items-center justify-between text-xs mt-auto pt-2 border-t border-gray-100">
@@ -78,10 +78,12 @@ const RestaurantCard = memo(({ data, index }) => {
               <Bike className="w-3.5 h-3.5 text-slate-500" />
               <span className="font-medium">{data.deliveryFee || '₹40'}</span>
             </div>
-            <div className="flex items-center gap-1 text-gray-600">
-              <MapPin className="w-3.5 h-3.5 text-slate-500" />
-              <span className="font-medium">{data.distance}</span>
-            </div>
+            {data.distance && data.distance !== 'N/A' && (
+              <div className="flex items-center gap-1 text-gray-600">
+                <MapPin className="w-3.5 h-3.5 text-slate-500" />
+                <span className="font-medium">{data.distance}</span>
+              </div>
+            )}
           </div>
 
         </div>

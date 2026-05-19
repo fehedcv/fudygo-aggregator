@@ -64,12 +64,12 @@ export const RestaurantProvider = ({ children }) => {
         address: item.address,
         image: item.logo_url || "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&auto=format&fit=crop&q=60",
         logo: item.logo_url || "https://cdn-icons-png.flaticon.com/512/732/732217.png",
-        rating: item.average_rating || 0, 
-        reviews: 100, // placeholder
+        rating: item.average_rating ? parseFloat(item.average_rating).toFixed(1) : '0.0',
+        reviews: item.total_reviews || 0,
         distance: item.distance_km ? `${item.distance_km.toFixed(2)} km` : 'N/A',
-        time: "30-45 mins", // placeholder
-        deliveryFee: "£2.50", // placeholder
-        minOrder: "£10", // placeholder
+        time: item.average_delivery_time ? `${item.average_delivery_time}-${item.average_delivery_time + 10} mins` : '30-45 mins',
+        deliveryFee: item.delivery_fee === 0 ? 'Free Delivery' : item.delivery_fee ? `₹${item.delivery_fee}` : '₹2.50',
+        minOrder: "₹10", // placeholder
         discount: null, // placeholder
         isPreOrder: false // placeholder
       }));

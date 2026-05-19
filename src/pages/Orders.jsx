@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import axiosClient from '../api/axiosClient';
 import { useAuth } from '../context/AuthContext';
 import { useRestaurants } from '../context/RestaurantContext'; // To look up restaurant names
+import { useCart } from '../context/CartContext';
 import { 
   Package, Clock, CheckCircle, XCircle, ChevronRight, 
   MapPin, Calendar, Receipt, ShoppingBag, ArrowLeft, Loader2, RotateCcw, LogIn
@@ -11,6 +12,7 @@ import {
 const Orders = () => {
   const { currentUser, loginWithGoogle } = useAuth();
   const { getRestaurantById } = useRestaurants();
+  const { addToCart } = useCart();
   const navigate = useNavigate();
   
   const [orders, setOrders] = useState([]);
@@ -89,6 +91,23 @@ const Orders = () => {
     return new Date(dateString).toLocaleDateString('en-GB', {
       day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
     });
+  };
+
+  const handleReorder = (order) => {
+    const restaurant = getRestaurantById(order.restaurant_id);
+    const restaurantName = restaurant ? restaurant.name : `Restaurant #${order.restaurant_id}`;
+
+    order.items.forEach((item) => {
+      const cartItem = {
+        id: item.id || item.item_id || `${order.restaurant_id}-${item.name}`,
+        name: item.name,
+        price: item.price || item.unit_price || (item.quantity && item.total_price ? (item.total_price / item.quantity).toFixed(2) : 0),
+        image: item.image_url || item.image || ''
+      };
+      addToCart(cartItem, order.restaurant_id, restaurantName);
+    });
+
+    navigate('/cart');
   };
 
   if (loading) {
@@ -198,7 +217,10 @@ const Orders = () => {
                       <button className="text-xs font-bold text-gray-500 hover:text-gray-900">
                           View Details
                       </button>
-                      <button className="text-sm font-bold text-slate-700 hover:bg-yellow-50 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5">
+                      <button
+                        onClick={() => handleReorder(order)}
+                        className="text-sm font-bold text-slate-700 hover:bg-yellow-50 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5"
+                      >
                           <RotateCcw className="w-3 h-3" /> Reorder
                       </button>
                   </div>

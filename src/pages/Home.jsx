@@ -1,35 +1,33 @@
-import { Search, Loader2, MapPinOff, Truck, Store } from 'lucide-react';
+import { Search, MapPinOff, Store } from 'lucide-react';
 import { useLocation } from '../context/LocationContext';
 import { useRestaurants } from '../context/RestaurantContext';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import RestaurantCard from '../components/RestaurantCard';
 import HomeSkeleton from '../components/HomeSkeleton';
 
 const Home = () => {
   const { coordinates } = useLocation();
-  const { 
-    restaurants, 
-    loading, 
-    error, 
-    filters,
-    updateFilters 
-  } = useRestaurants();
-
-  const [orderType, setOrderType] = useState('delivery');
-  const isFirstLoad = useRef(true);
+  const { restaurants, loading, error } = useRestaurants();
+  const navigate = useNavigate();
+  const [searchValue, setSearchValue] = useState('');
 
   useEffect(() => {
-    if (restaurants.length > 0 || error || (!loading && coordinates)) {
-      isFirstLoad.current = false;
-    }
-  }, [restaurants, error, loading, coordinates]);
+    if (!searchValue.trim()) return;
+    const timer = setTimeout(() => {
+      navigate(`/search?q=${encodeURIComponent(searchValue.trim())}`);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [searchValue, navigate]);
 
-  const handleSearchChange = (e) => {
-    updateFilters({ name: e.target.value });
+  const handleSearchKeyDown = (e) => {
+    if (e.key === 'Enter' && searchValue.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchValue.trim())}`);
+    }
   };
 
-  if (loading && isFirstLoad.current) {
+  if (loading && restaurants.length === 0 && !error) {
     return <HomeSkeleton />;
   }
 
@@ -41,18 +39,15 @@ const Home = () => {
           {/* Search Bar */}
           <div className="relative mb-6">
             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-              {loading && !isFirstLoad.current ? (
-                <Loader2 className="h-5 w-5 text-gray-400 animate-spin" />
-              ) : (
-                <Search className="h-5 w-5 text-gray-400" />
-              )}
+              <Search className="h-5 w-5 text-gray-400" />
             </div>
-            <input 
-              type="text" 
-              placeholder="Search by restaurant name..." 
+            <input
+              type="text"
+              placeholder="Search restaurants or food..."
               className="w-full pl-11 pr-4 py-4 bg-gray-50 border-none rounded-xl text-sm font-medium focus:ring-2 focus:ring-yellow-100 focus:bg-white transition-all outline-none placeholder-gray-400 shadow-sm"
-              value={filters.name}
-              onChange={handleSearchChange}
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              onKeyDown={handleSearchKeyDown}
             />
           </div>
 
@@ -76,21 +71,6 @@ const Home = () => {
               >
                 Retry
               </button>
-            </div>
-          ) : loading && restaurants.length === 0 ? (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-3">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="bg-white rounded-xl border border-gray-100 overflow-hidden animate-pulse">
-                  <div className="w-full h-32 lg:h-36 bg-gray-300"></div>
-                  <div className="p-4 space-y-2">
-                    <div className="flex justify-between items-start mb-2">
-                      <div className="h-5 bg-gray-300 rounded w-3/4"></div>
-                      <div className="h-5 w-12 bg-gray-200 rounded"></div>
-                    </div>
-                    <div className="h-4 bg-gray-200 rounded w-full"></div>
-                  </div>
-                </div>
-              ))}
             </div>
           ) : restaurants.length === 0 ? (
             <div className="text-center py-20 text-gray-500">No restaurants found.</div>

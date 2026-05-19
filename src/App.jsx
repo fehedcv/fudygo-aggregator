@@ -4,6 +4,7 @@ import Lenis from '@studio-freight/lenis';
 import Navbar from './components/Navbar';
 import WelcomeModal from './components/WelcomeModal';
 import Home from './pages/Home';
+import SearchResults from './pages/SearchResults';
 import RestaurantDetails from './pages/RestaurantDetails';
 import Cart from './pages/Cart';
 import Profile from './pages/Profile';
@@ -83,6 +84,7 @@ function App() {
       <div className="pb-20 xl:pb-0">
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/search" element={<SearchResults />} />
           <Route path="/restaurant/:id" element={<RestaurantDetails />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/profile" element={<Profile />} />
