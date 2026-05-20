@@ -183,13 +183,7 @@ const Navbar = () => {
                 <MapPin className="w-6 h-6" />
               </button>
               
-              <button onClick={() => setIsFilterOpen(true)} className="p-2 text-gray-600 hover:text-slate-700 hover:bg-slate-50 rounded-full transition-colors">
-                <SlidersHorizontal className="w-6 h-6" />
-              </button>
-
-              <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-2 rounded-md text-gray-600 hover:text-slate-700 hover:bg-gray-100 transition-colors">
-                {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-              </button>
+              
             </div>
           </div>
         </div>
