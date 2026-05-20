@@ -57,7 +57,7 @@ export const restaurants = [
     deliveryFee: "£4.75",
     minOrder: "£15",
     discount: "25% OFF",
-    minSpend: "£15.60",
+    minSpend: "£15.600",
     categories: ["Fish", "Chips", "Burgers", "Sausages", "Kids Meals"],
     menu: {
       Fish: [
