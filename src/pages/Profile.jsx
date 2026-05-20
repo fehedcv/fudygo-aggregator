@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import LocationPickerMap from '../components/LocationPickerMap';
+import { getCurrentPosition } from '../lib/geolocation';
 
 const Profile = () => {
   const { currentUser, logout, loginWithGoogle } = useAuth();
@@ -80,20 +81,16 @@ const Profile = () => {
     setSuggestions([]);
   };
 
-  const handleUseCurrentLocation = () => {
-    if (!navigator.geolocation) return alert('Geolocation not supported');
+  const handleUseCurrentLocation = async () => {
     setIsFetchingLocation(true);
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setIsFetchingLocation(false);
-        setMapPickerPosition([pos.coords.latitude, pos.coords.longitude]);
-      },
-      () => {
-        setIsFetchingLocation(false);
-        alert('Location failed. Please search manually.');
-      },
-      { enableHighAccuracy: true }
-    );
+    try {
+      const { latitude, longitude } = await getCurrentPosition();
+      setMapPickerPosition([latitude, longitude]);
+    } catch {
+      alert('Location failed. Please allow location permission and try again.');
+    } finally {
+      setIsFetchingLocation(false);
+    }
   };
 
   const handleMapConfirm = (lat, lng, geocodeData) => {

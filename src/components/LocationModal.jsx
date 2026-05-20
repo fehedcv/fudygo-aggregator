@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { X, Crosshair, Search, Loader2, MapPin } from 'lucide-react';
+import { getCurrentPosition } from '../lib/geolocation';
 
 const LocationModal = ({ isOpen, onClose, onUpdateLocation }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -57,33 +58,24 @@ const LocationModal = ({ isOpen, onClose, onUpdateLocation }) => {
   };
 
   // 3. Handle GPS
-  const handleUseCurrentLocation = () => {
-    if (!navigator.geolocation) {
-      alert('Geolocation is not supported by your browser');
-      return;
-    }
+  const handleUseCurrentLocation = async () => {
     setIsLoading(true);
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const { latitude, longitude } = position.coords;
-        try {
-            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
-            const data = await response.json();
-            // Try to find the city/town name from address object
-            const city = data.address.city || data.address.town || data.address.village || data.address.suburb || "Current Location";
-            onUpdateLocation(city, { lat: latitude, lng: longitude });
-        } catch (error) {
-            onUpdateLocation(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`, { lat: latitude, lng: longitude });
-        } finally {
-            setIsLoading(false);
-            onClose();
-        }
-      },
-      () => {
-        setIsLoading(false);
-        alert('Unable to retrieve location.');
+    try {
+      const { latitude, longitude } = await getCurrentPosition();
+      try {
+        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+        const data = await response.json();
+        const city = data.address.city || data.address.town || data.address.village || data.address.suburb || 'Current Location';
+        onUpdateLocation(city, { lat: latitude, lng: longitude });
+      } catch {
+        onUpdateLocation(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`, { lat: latitude, lng: longitude });
       }
-    );
+      onClose();
+    } catch {
+      alert('Location failed. Please allow location permission and try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // 4. Handle Manual "Enter" Key
