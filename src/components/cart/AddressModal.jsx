@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
 import { X, Loader2, MapPin, Home, Briefcase, Plus, CheckCircle2, Crosshair, ArrowLeft, Search } from 'lucide-react';
 import axiosClient from '../../api/axiosClient';
+import LocationPickerMap from '../LocationPickerMap';
+import { getCurrentPosition } from '../../lib/geolocation';
 
 const AddressModal = ({ isOpen, onClose, addresses, loading, selectedId, onSelect, onAddressAdded }) => {
   const [showForm, setShowForm] = useState(false);
   const [isFetchingLocation, setIsFetchingLocation] = useState(false);
+  const [mapPickerPosition, setMapPickerPosition] = useState(null);
   const [isSearching, setIsSearching] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
@@ -22,6 +25,7 @@ const AddressModal = ({ isOpen, onClose, addresses, loading, selectedId, onSelec
   useEffect(() => {
     if (!isOpen) {
       setShowForm(false);
+      setMapPickerPosition(null);
       resetForm();
     }
   }, [isOpen]);
@@ -79,35 +83,30 @@ const AddressModal = ({ isOpen, onClose, addresses, loading, selectedId, onSelec
     setSuggestions([]);
   };
 
-  const handleUseCurrentLocation = () => {
-    if (!navigator.geolocation) return alert('Geolocation not supported');
+  const handleUseCurrentLocation = async () => {
     setIsFetchingLocation(true);
+    try {
+      const { latitude, longitude } = await getCurrentPosition();
+      setMapPickerPosition([latitude, longitude]);
+    } catch {
+      alert('Location failed. Please allow location permission and try again.');
+    } finally {
+      setIsFetchingLocation(false);
+    }
+  };
 
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const { latitude, longitude } = position.coords;
-        try {
-          const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`);
-          const data = await response.json();
-          const addr = data.address || {};
-          setNewAddress({
-            ...newAddress,
-            address: data.display_name,
-            latitude: String(latitude),
-            longitude: String(longitude),
-            city: addr.city || addr.town || "",
-            state: addr.state || "",
-            postal_code: addr.postcode || ""
-          });
-        } catch (e) { alert("Could not fetch address details."); }
-        finally { setIsFetchingLocation(false); }
-      },
-      () => {
-        setIsFetchingLocation(false);
-        alert('Location failed. Please search manually.');
-      },
-      { enableHighAccuracy: true }
-    );
+  const handleMapConfirm = (lat, lng, geocodeData) => {
+    const addr = geocodeData?.address || {};
+    setNewAddress({
+      ...newAddress,
+      address: geocodeData?.display_name || `${lat}, ${lng}`,
+      latitude: String(lat),
+      longitude: String(lng),
+      city: addr.city || addr.town || addr.village || '',
+      state: addr.state || '',
+      postal_code: addr.postcode || '',
+    });
+    setMapPickerPosition(null);
   };
 
   const handleSaveAddress = async (e) => {
@@ -148,6 +147,7 @@ const AddressModal = ({ isOpen, onClose, addresses, loading, selectedId, onSelec
   };
 
   return (
+    <>
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={onClose}></div>
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md relative z-10 overflow-hidden animate-in fade-in zoom-in duration-200">
@@ -311,6 +311,15 @@ const AddressModal = ({ isOpen, onClose, addresses, loading, selectedId, onSelec
         </div>
       </div>
     </div>
+
+    {mapPickerPosition && (
+      <LocationPickerMap
+        initialPosition={mapPickerPosition}
+        onConfirm={handleMapConfirm}
+        onClose={() => setMapPickerPosition(null)}
+      />
+    )}
+    </>
   );
 };
 
